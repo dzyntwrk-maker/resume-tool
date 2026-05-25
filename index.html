@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResumeAI — Tailored Resumes & Cover Letters in Seconds</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --border: #1f2937;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+
+    /* Nav */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .nav-cta { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: background .2s; }
+    .nav-cta:hover { background: #4f46e5; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 80px 20px 60px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 24px; }
+    .hero h1 { font-size: clamp(36px, 6vw, 64px); font-weight: 900; line-height: 1.1; margin-bottom: 20px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 18px; max-width: 520px; margin: 0 auto 36px; line-height: 1.6; }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 32px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-primary:hover { opacity: .88; }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); padding: 14px 28px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; transition: border-color .2s; }
+    .btn-outline:hover { border-color: var(--accent); }
+
+    /* Stats */
+    .stats { display: flex; justify-content: center; gap: 60px; padding: 40px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 40px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 32px; font-weight: 800; color: var(--accent); }
+    .stat-label { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+    /* App */
+    .app { max-width: 900px; margin: 60px auto; padding: 0 20px; }
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .app-header { padding: 24px 28px 0; display: flex; align-items: center; gap: 12px; }
+    .step-badge { background: var(--accent); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .app-header h2 { font-size: 20px; font-weight: 700; }
+
+    /* Form */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 24px 28px; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .stats { gap: 30px; } nav { padding: 16px 20px; } }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    textarea, input, select {
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .15s;
+      font-family: inherit;
+      resize: vertical;
+    }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+    .char-count { font-size: 11px; color: var(--muted); text-align: right; margin-top: 2px; }
+
+    /* Generate button */
+    .generate-bar { padding: 0 28px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .btn-generate { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; display: flex; align-items: center; gap: 8px; }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+
+    /* Output */
+    .output-section { padding: 0 28px 28px; display: none; }
+    .output-section.visible { display: block; }
+    .output-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+    .output-tab { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; transition: color .15s; }
+    .output-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .output-content { display: none; }
+    .output-content.active { display: block; }
+    .output-box {
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      min-height: 200px;
+      color: #cbd5e1;
+      position: relative;
+    }
+    .output-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-copy { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s; }
+    .btn-copy:hover { border-color: var(--accent); }
+    .btn-download { background: var(--green); color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: opacity .2s; }
+    .btn-download:hover { opacity: .88; }
+
+    /* Loader */
+    .loader { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; padding: 20px 0; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .error-box { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; margin-top: 16px; display: none; }
+    .error-box.visible { display: block; }
+
+    /* Paywall */
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.1), rgba(139,92,246,.1)); border: 1px solid rgba(99,102,241,.3); border-radius: 12px; padding: 28px; text-align: center; margin: 20px 28px 28px; display: none; }
+    .paywall.visible { display: block; }
+    .paywall h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    .paywall p { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
+    .price-tag { font-size: 36px; font-weight: 900; color: var(--accent); }
+    .price-tag span { font-size: 16px; font-weight: 400; color: var(--muted); }
+    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 40px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 16px; transition: opacity .2s; width: 100%; }
+    .btn-pay:hover { opacity: .88; }
+
+    /* Features */
+    .features { max-width: 900px; margin: 60px auto; padding: 0 20px; }
+    .features h2 { text-align: center; font-size: 32px; font-weight: 800; margin-bottom: 40px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+    .feature-icon { font-size: 28px; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+    footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 60px; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">ResumeAI</div>
+  <button class="nav-cta" onclick="scrollToApp()">Try Free →</button>
+</nav>
+
+<section class="hero">
+  <div class="badge">⚡ AI-Powered • Takes 30 seconds</div>
+  <h1>Land More Interviews with<br><span>AI-Tailored Resumes</span></h1>
+  <p>Paste your resume and a job description. We rewrite your bullet points and generate a perfect cover letter — matched to exactly what the company wants.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="scrollToApp()">Tailor My Resume Free</button>
+    <button class="btn-outline" onclick="scrollToApp()">See Example Output</button>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num">2x</div><div class="stat-label">More interview callbacks</div></div>
+  <div class="stat"><div class="stat-num">30s</div><div class="stat-label">Average generation time</div></div>
+  <div class="stat"><div class="stat-num">$0</div><div class="stat-label">First tailoring free</div></div>
+</div>
+
+<div class="app" id="app">
+  <div class="app-card">
+    <div class="app-header">
+      <div class="step-badge">1</div>
+      <h2>Paste Your Resume + Job Description</h2>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Your Current Resume</label>
+        <textarea id="resume" rows="8" placeholder="Paste your resume here — work experience, skills, education…" oninput="countChars(this, 'resume-count')"></textarea>
+        <div class="char-count" id="resume-count">0 characters</div>
+      </div>
+      <div class="form-group full">
+        <label>Job Description</label>
+        <textarea id="job-desc" rows="6" placeholder="Paste the full job posting here…" oninput="countChars(this, 'job-count')"></textarea>
+        <div class="char-count" id="job-count">0 characters</div>
+      </div>
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" id="name" placeholder="Jane Smith">
+      </div>
+      <div class="form-group">
+        <label>Target Role</label>
+        <input type="text" id="role" placeholder="e.g. Senior Product Manager">
+      </div>
+      <div class="form-group">
+        <label>Tone</label>
+        <select id="tone">
+          <option value="professional">Professional</option>
+          <option value="confident">Confident & Direct</option>
+          <option value="enthusiastic">Enthusiastic</option>
+          <option value="concise">Concise & Punchy</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Output</label>
+        <select id="output-type">
+          <option value="both">Resume + Cover Letter</option>
+          <option value="resume">Resume Tailoring Only</option>
+          <option value="cover">Cover Letter Only</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="generate-bar">
+      <button class="btn-generate" id="generate-btn" onclick="generate()">
+        <span>✨</span> Tailor My Resume
+      </button>
+      <span class="free-note" id="free-note">First use free — no account needed</span>
+    </div>
+
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <span id="loader-text">Analyzing job description…</span>
+    </div>
+
+    <div class="output-section" id="output-section">
+      <div class="output-tabs">
+        <div class="output-tab active" onclick="switchTab('resume-out')">Tailored Resume</div>
+        <div class="output-tab" onclick="switchTab('cover-out')">Cover Letter</div>
+      </div>
+      <div class="output-content active" id="resume-out">
+        <div class="output-box" id="resume-output"></div>
+        <div class="output-actions">
+          <button class="btn-copy" onclick="copyOutput('resume-output')">📋 Copy</button>
+          <button class="btn-download" onclick="downloadOutput('resume-output', 'resume')">⬇ Download .txt</button>
+        </div>
+      </div>
+      <div class="output-content" id="cover-out">
+        <div class="output-box" id="cover-output"></div>
+        <div class="output-actions">
+          <button class="btn-copy" onclick="copyOutput('cover-output')">📋 Copy</button>
+          <button class="btn-download" onclick="downloadOutput('cover-output', 'cover-letter')">⬇ Download .txt</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <div class="paywall" id="paywall">
+      <h3>You've used your free tailoring</h3>
+      <p>Unlock unlimited resume tailoring + cover letters for one low price.</p>
+      <div class="price-tag">$4.99 <span>/ 10 tailorings</span></div>
+      <button class="btn-pay" onclick="startCheckout()">Pay $4.99 via Cash App →</button>
+      <p style="margin-top:12px;font-size:12px;">Send <strong>$4.99</strong> to <strong>$DzyNtwrk</strong> on Cash App, then DM <a href="https://instagram.com/thedizzyinc" target="_blank" style="color:var(--accent);">@thedizzyinc</a> for your access code</p>
+    </div>
+  </div>
+</div>
+
+<section class="features">
+  <h2>Why Job Seekers Love ResumeAI</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Keyword Matching</h3>
+      <p>We extract the exact keywords recruiters and ATS systems look for, then weave them naturally into your resume.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✍️</div>
+      <h3>Rewritten Bullet Points</h3>
+      <p>Your experience is reframed to highlight what this specific role cares about — not just generic job duties.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💌</div>
+      <h3>Personalized Cover Letter</h3>
+      <p>A compelling, non-generic cover letter that references the company, the role, and your specific experience.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>30 Seconds</h3>
+      <p>Paste, click, done. No account creation, no waiting. Download or copy and send.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 ResumeAI · Built with Claude API · <a href="#" style="color:var(--muted);">Privacy</a> · <a href="#" style="color:var(--muted);">Terms</a></p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

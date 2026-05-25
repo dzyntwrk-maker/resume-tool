@@ -1,0 +1,177 @@
+// ResumeAI frontend logic
+// API endpoint is /api/generate — handled by api/generate.js (Vercel serverless)
+
+const API_URL = "/api/generate";
+// Payment: send $4.99 via Cash App $DzyNtwrk — link in paywall modal
+const STRIPE_LINK = "https://cash.app/$DzyNtwrk/4.99"; // Cash App payment
+
+let usesRemaining = parseInt(localStorage.getItem("resumeai_uses") || "1");
+let sessionToken = localStorage.getItem("resumeai_token") || null;
+
+function scrollToApp() {
+  document.getElementById("app").scrollIntoView({ behavior: "smooth" });
+}
+
+function countChars(el, countId) {
+  document.getElementById(countId).textContent = `${el.value.length.toLocaleString()} characters`;
+}
+
+function showLoader(text) {
+  const loader = document.getElementById("loader");
+  loader.classList.add("visible");
+  document.getElementById("loader-text").textContent = text;
+}
+
+function hideLoader() {
+  document.getElementById("loader").classList.remove("visible");
+}
+
+function showError(msg) {
+  const el = document.getElementById("error-box");
+  el.textContent = msg;
+  el.classList.add("visible");
+  setTimeout(() => el.classList.remove("visible"), 6000);
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll(".output-tab").forEach((t, i) => {
+    t.classList.toggle("active", (i === 0 && tabId === "resume-out") || (i === 1 && tabId === "cover-out"));
+  });
+  document.querySelectorAll(".output-content").forEach(c => c.classList.remove("active"));
+  document.getElementById(tabId).classList.add("active");
+}
+
+function copyOutput(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = "✅ Copied!";
+    setTimeout(() => { btn.textContent = "📋 Copy"; }, 2000);
+  });
+}
+
+function downloadOutput(id, filename) {
+  const text = document.getElementById(id).textContent;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+  a.download = `${filename}.txt`;
+  a.click();
+}
+
+function startCheckout() {
+  window.open(STRIPE_LINK, "_blank");
+}
+
+function typeText(elementId, text, speed = 8) {
+  const el = document.getElementById(elementId);
+  el.textContent = "";
+  let i = 0;
+  const interval = setInterval(() => {
+    el.textContent += text[i];
+    i++;
+    if (i >= text.length) clearInterval(interval);
+  }, speed);
+}
+
+async function generate() {
+  const resume = document.getElementById("resume").value.trim();
+  const jobDesc = document.getElementById("job-desc").value.trim();
+  const name = document.getElementById("name").value.trim();
+  const role = document.getElementById("role").value.trim();
+  const tone = document.getElementById("tone").value;
+  const outputType = document.getElementById("output-type").value;
+
+  if (!resume) { showError("Please paste your resume."); return; }
+  if (!jobDesc) { showError("Please paste the job description."); return; }
+
+  // Check free uses
+  if (usesRemaining <= 0 && !sessionToken) {
+    document.getElementById("paywall").classList.add("visible");
+    return;
+  }
+
+  document.getElementById("generate-btn").disabled = true;
+  document.getElementById("output-section").classList.remove("visible");
+  document.getElementById("error-box").classList.remove("visible");
+  document.getElementById("paywall").classList.remove("visible");
+
+  const loaderTexts = [
+    "Analyzing job description…",
+    "Extracting key requirements…",
+    "Tailoring your experience…",
+    "Writing cover letter…",
+    "Polishing output…"
+  ];
+  let loaderIdx = 0;
+  showLoader(loaderTexts[0]);
+  const loaderInterval = setInterval(() => {
+    loaderIdx = (loaderIdx + 1) % loaderTexts.length;
+    document.getElementById("loader-text").textContent = loaderTexts[loaderIdx];
+  }, 2000);
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resume, jobDesc, name, role, tone, outputType, token: sessionToken })
+    });
+
+    clearInterval(loaderInterval);
+    hideLoader();
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error || `Server error ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Decrement free uses
+    if (!sessionToken) {
+      usesRemaining--;
+      localStorage.setItem("resumeai_uses", usesRemaining.toString());
+      if (usesRemaining <= 0) {
+        document.getElementById("free-note").textContent = "Free use spent — see pricing below";
+      }
+    }
+
+    // Display output
+    document.getElementById("output-section").classList.add("visible");
+
+    if (data.resume) {
+      typeText("resume-output", data.resume);
+    } else {
+      document.getElementById("resume-output").textContent = "(Resume tailoring not requested)";
+    }
+
+    if (data.coverLetter) {
+      document.getElementById("cover-output").textContent = data.coverLetter;
+    } else {
+      document.getElementById("cover-output").textContent = "(Cover letter not requested)";
+    }
+
+    // Show the relevant tab first
+    if (outputType === "cover") {
+      switchTab("cover-out");
+    } else {
+      switchTab("resume-out");
+    }
+
+  } catch (err) {
+    clearInterval(loaderInterval);
+    hideLoader();
+    showError(`Error: ${err.message}`);
+  } finally {
+    document.getElementById("generate-btn").disabled = false;
+  }
+}
+
+// Handle paid token from URL (after Stripe redirect)
+const params = new URLSearchParams(window.location.search);
+if (params.get("token")) {
+  sessionToken = params.get("token");
+  localStorage.setItem("resumeai_token", sessionToken);
+  usesRemaining = 999;
+  document.getElementById("free-note").textContent = "✅ Unlimited access unlocked";
+  history.replaceState({}, "", "/");
+}
