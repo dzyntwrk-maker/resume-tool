@@ -3,7 +3,7 @@
 
 const API_URL = "/api/generate";
 // TODO: Replace with your Payhip product URL after creating the product
-const PAYHIP_URL = "https://payhip.com/b/RESUMEAI";
+const PAYHIP_URL = "https://payhip.com/b/gFaqD";
 
 let usesRemaining = parseInt(localStorage.getItem("resumeai_uses") ?? "1");
 
