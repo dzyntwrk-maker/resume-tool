@@ -116,14 +116,23 @@
     .error-box.visible { display: block; }
 
     /* Paywall */
-    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.1), rgba(139,92,246,.1)); border: 1px solid rgba(99,102,241,.3); border-radius: 12px; padding: 28px; text-align: center; margin: 20px 28px 28px; display: none; }
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); border: 1px solid rgba(99,102,241,.25); border-radius: 16px; padding: 32px 28px; margin: 20px 28px 28px; display: none; }
     .paywall.visible { display: block; }
-    .paywall h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-    .paywall p { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
-    .price-tag { font-size: 36px; font-weight: 900; color: var(--accent); }
-    .price-tag span { font-size: 16px; font-weight: 400; color: var(--muted); }
-    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 40px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 16px; transition: opacity .2s; width: 100%; }
+    .paywall h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .paywall > p { color: var(--muted); margin-bottom: 24px; font-size: 14px; line-height: 1.5; }
+    .price-row { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-bottom: 20px; }
+    .price-tag { font-size: 42px; font-weight: 900; color: var(--accent); }
+    .price-desc { font-size: 15px; color: var(--muted); }
+    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 15px 40px; border-radius: 10px; font-size: 17px; font-weight: 700; cursor: pointer; transition: opacity .2s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
     .btn-pay:hover { opacity: .88; }
+    .paywall-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 20px; color: var(--muted); font-size: 12px; }
+    .paywall-divider::before, .paywall-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    .code-row { display: flex; gap: 10px; }
+    .code-input { flex: 1; background: #0d1425; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 11px 14px; outline: none; transition: border-color .15s; font-family: monospace; letter-spacing: 1px; }
+    .code-input:focus { border-color: var(--accent); }
+    .btn-unlock { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 11px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 700; transition: border-color .15s, color .15s; white-space: nowrap; }
+    .btn-unlock:hover { border-color: var(--accent); color: var(--accent); }
+    .code-hint { font-size: 12px; color: var(--muted); margin-top: 8px; text-align: left; }
 
     /* Features */
     .features { max-width: 900px; margin: 60px auto; padding: 0 20px; }
@@ -242,10 +251,20 @@
 
     <div class="paywall" id="paywall">
       <h3>You've used your free tailoring</h3>
-      <p>Unlock unlimited resume tailoring + cover letters for one low price.</p>
-      <div class="price-tag">$4.99 <span>/ 10 tailorings</span></div>
-      <button class="btn-pay" onclick="startCheckout()">Pay $4.99 via Cash App →</button>
-      <p style="margin-top:12px;font-size:12px;">Send <strong>$4.99</strong> to <strong>$DzyNtwrk</strong> on Cash App, then DM <a href="https://instagram.com/thedizzyinc" target="_blank" style="color:var(--accent);">@thedizzyinc</a> for your access code</p>
+      <p>Get 10 more tailorings instantly. You'll receive an access code by download — paste it below to unlock.</p>
+      <div class="price-row">
+        <div class="price-tag">$4.99</div>
+        <div class="price-desc">for 10 tailorings</div>
+      </div>
+      <button class="btn-pay" onclick="startCheckout()">
+        <span>🔓</span> Get 10 Tailorings — $4.99
+      </button>
+      <div class="paywall-divider">Already purchased?</div>
+      <div class="code-row">
+        <input class="code-input" id="access-code" type="text" placeholder="Paste your access code here…" autocomplete="off">
+        <button class="btn-unlock" onclick="redeemCode()">Unlock</button>
+      </div>
+      <div class="code-hint">Your access code is in the download you received from Payhip after purchase.</div>
     </div>
   </div>
 </div>
@@ -277,7 +296,7 @@
 </section>
 
 <footer>
-  <p>© 2025 ResumeAI · Built with Claude API · <a href="#" style="color:var(--muted);">Privacy</a> · <a href="#" style="color:var(--muted);">Terms</a></p>
+  <p>© 2026 ResumeAI by <a href="https://instagram.com/thedizzyinc" target="_blank" style="color:var(--muted);">Dizzy Inc</a> · <a href="#" style="color:var(--muted);">Privacy</a> · <a href="#" style="color:var(--muted);">Terms</a></p>
 </footer>
 
 <script src="app.js"></script>

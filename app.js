@@ -1,12 +1,11 @@
 // ResumeAI frontend logic
-// API endpoint is /api/generate — handled by api/generate.js (Vercel serverless)
+// Payment: Payhip product page — buyer receives access code in download
 
 const API_URL = "/api/generate";
-// Payment: send $4.99 via Cash App $DzyNtwrk — link in paywall modal
-const STRIPE_LINK = "https://cash.app/$DzyNtwrk/4.99"; // Cash App payment
+// TODO: Replace with your Payhip product URL after creating the product
+const PAYHIP_URL = "https://payhip.com/b/RESUMEAI";
 
-let usesRemaining = parseInt(localStorage.getItem("resumeai_uses") || "1");
-let sessionToken = localStorage.getItem("resumeai_token") || null;
+let usesRemaining = parseInt(localStorage.getItem("resumeai_uses") ?? "1");
 
 function scrollToApp() {
   document.getElementById("app").scrollIntoView({ behavior: "smooth" });
@@ -59,7 +58,49 @@ function downloadOutput(id, filename) {
 }
 
 function startCheckout() {
-  window.open(STRIPE_LINK, "_blank");
+  window.open(PAYHIP_URL, "_blank");
+}
+
+function redeemCode() {
+  const input = document.getElementById("access-code");
+  const code = input.value.trim().toUpperCase();
+
+  if (!code) {
+    input.focus();
+    return;
+  }
+
+  // Validate code against API
+  fetch("/api/redeem", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code })
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.valid) {
+        usesRemaining += 10;
+        localStorage.setItem("resumeai_uses", usesRemaining.toString());
+        // track redeemed codes so same code can only be used once per browser
+        const used = JSON.parse(localStorage.getItem("resumeai_redeemed") || "[]");
+        used.push(code);
+        localStorage.setItem("resumeai_redeemed", JSON.stringify(used));
+        document.getElementById("paywall").classList.remove("visible");
+        document.getElementById("free-note").textContent = `✅ ${usesRemaining} tailorings remaining`;
+        input.value = "";
+      } else {
+        input.style.borderColor = "#ef4444";
+        input.value = "";
+        input.placeholder = "Invalid code — check your Payhip download";
+        setTimeout(() => {
+          input.style.borderColor = "";
+          input.placeholder = "Paste your access code here…";
+        }, 3000);
+      }
+    })
+    .catch(() => {
+      showError("Could not validate code. Please try again.");
+    });
 }
 
 function typeText(elementId, text, speed = 8) {
@@ -84,9 +125,9 @@ async function generate() {
   if (!resume) { showError("Please paste your resume."); return; }
   if (!jobDesc) { showError("Please paste the job description."); return; }
 
-  // Check free uses
-  if (usesRemaining <= 0 && !sessionToken) {
+  if (usesRemaining <= 0) {
     document.getElementById("paywall").classList.add("visible");
+    document.getElementById("paywall").scrollIntoView({ behavior: "smooth", block: "center" });
     return;
   }
 
@@ -113,7 +154,7 @@ async function generate() {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resume, jobDesc, name, role, tone, outputType, token: sessionToken })
+      body: JSON.stringify({ resume, jobDesc, name, role, tone, outputType })
     });
 
     clearInterval(loaderInterval);
@@ -126,16 +167,10 @@ async function generate() {
 
     const data = await response.json();
 
-    // Decrement free uses
-    if (!sessionToken) {
-      usesRemaining--;
-      localStorage.setItem("resumeai_uses", usesRemaining.toString());
-      if (usesRemaining <= 0) {
-        document.getElementById("free-note").textContent = "Free use spent — see pricing below";
-      }
-    }
+    usesRemaining--;
+    localStorage.setItem("resumeai_uses", usesRemaining.toString());
+    updateUsesNote();
 
-    // Display output
     document.getElementById("output-section").classList.add("visible");
 
     if (data.resume) {
@@ -150,7 +185,6 @@ async function generate() {
       document.getElementById("cover-output").textContent = "(Cover letter not requested)";
     }
 
-    // Show the relevant tab first
     if (outputType === "cover") {
       switchTab("cover-out");
     } else {
@@ -166,12 +200,17 @@ async function generate() {
   }
 }
 
-// Handle paid token from URL (after Stripe redirect)
-const params = new URLSearchParams(window.location.search);
-if (params.get("token")) {
-  sessionToken = params.get("token");
-  localStorage.setItem("resumeai_token", sessionToken);
-  usesRemaining = 999;
-  document.getElementById("free-note").textContent = "✅ Unlimited access unlocked";
-  history.replaceState({}, "", "/");
+function updateUsesNote() {
+  const note = document.getElementById("free-note");
+  if (usesRemaining <= 0) {
+    note.textContent = "No tailorings left — unlock more below";
+    note.style.color = "#f87171";
+  } else if (usesRemaining === 1) {
+    note.textContent = "1 free tailoring remaining";
+  } else {
+    note.textContent = `${usesRemaining} tailorings remaining`;
+  }
 }
+
+// Init
+updateUsesNote();
