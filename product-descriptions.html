@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Description Generator — Shopify & WooCommerce Bulk AI Descriptions</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0f1e; --surface: #111827; --border: #1f2937; --accent: #6366f1; --accent2: #8b5cf6; --text: #f1f5f9; --muted: #64748b; --green: #10b981; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 14px; text-decoration: none; }
+    .nav-links a:hover { color: var(--text); }
+    @media (max-width: 600px) { nav { padding: 16px 20px; } .nav-links { gap: 12px; } .nav-links a { font-size: 13px; } }
+
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+
+    .app { max-width: 900px; margin: 40px auto; padding: 0 20px 60px; }
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+    /* Mode toggle */
+    .mode-toggle { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+    .mode-btn { flex: 1; padding: 14px; background: none; border: none; color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; border-bottom: 2px solid transparent; }
+    .mode-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(99,102,241,.05); }
+    .mode-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.03); }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 24px 28px; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; padding: 16px; } }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .label-hint { font-size: 11px; color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 6px; }
+    textarea, input, select { background: #0d1425; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .15s; font-family: inherit; resize: vertical; width: 100%; }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+
+    .generate-bar { padding: 0 28px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    @media (max-width: 640px) { .generate-bar { padding: 0 16px 20px; } }
+    .btn-generate { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+
+    .loader { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; padding: 20px 28px; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; margin: 0 28px 16px; display: none; }
+    .error-box.visible { display: block; }
+
+    /* Paywall */
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); border: 1px solid rgba(99,102,241,.25); border-radius: 16px; padding: 32px 28px; margin: 0 28px 28px; display: none; text-align: center; }
+    .paywall.visible { display: block; }
+    .paywall h3 { font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+    .paywall p { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+    .price-row { font-size: 42px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+    .price-sub { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+    .btn-pay { display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; text-decoration: none; }
+    .btn-pay:hover { opacity: .88; }
+
+    /* Results section */
+    .results-section { padding: 0 28px 28px; display: none; }
+    .results-section.visible { display: block; }
+    @media (max-width: 640px) { .results-section { padding: 0 16px 20px; } .error-box { margin: 0 16px 16px; } .paywall { margin: 0 16px 20px; padding: 24px 16px; } }
+
+    .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+    .results-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .results-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-action { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s; white-space: nowrap; }
+    .btn-action:hover { border-color: var(--accent); }
+    .btn-action.primary { background: rgba(99,102,241,.15); border-color: rgba(99,102,241,.4); color: #a5b4fc; }
+    .btn-action.primary:hover { border-color: var(--accent); }
+
+    /* Product card */
+    .product-card { background: #0d1425; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+    .product-card-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); background: rgba(99,102,241,.05); }
+    .product-card-name { font-size: 15px; font-weight: 700; color: var(--text); }
+    .btn-copy-card { background: none; border: 1px solid var(--border); color: var(--muted); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all .15s; }
+    .btn-copy-card:hover { border-color: var(--accent); color: var(--text); }
+
+    .product-card-body { padding: 16px 18px; }
+    .field-block { margin-bottom: 14px; }
+    .field-block:last-child { margin-bottom: 0; }
+    .field-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--accent); margin-bottom: 6px; }
+    .field-content { font-size: 14px; line-height: 1.7; color: #cbd5e1; }
+    .field-content.headline { font-size: 16px; font-weight: 700; color: var(--text); }
+    .bullets-list { list-style: none; padding: 0; }
+    .bullets-list li { font-size: 14px; line-height: 1.6; color: #cbd5e1; padding: 3px 0 3px 18px; position: relative; }
+    .bullets-list li::before { content: "•"; position: absolute; left: 4px; color: var(--accent); }
+    .keywords-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .kw-chip { background: rgba(99,102,241,.12); color: #a5b4fc; border: 1px solid rgba(99,102,241,.22); padding: 3px 10px; border-radius: 20px; font-size: 12px; }
+
+    footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">AI Tools</a>
+    <div class="nav-links">
+      <a href="/">Resume</a>
+      <a href="/listing-generator">Listings</a>
+      <a href="/product-descriptions" style="color:var(--text)">Products</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="badge">Shopify · WooCommerce · Amazon · Bulk Mode</div>
+    <h1>Bulk Product <span>Description Generator</span></h1>
+    <p>Generate SEO-optimized product descriptions, bullet points, and keywords for your entire catalog — in one click.</p>
+  </div>
+
+  <div class="app">
+    <div class="app-card">
+      <!-- Mode toggle -->
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="mode-bulk" onclick="setMode('bulk')">📦 Bulk Mode (multiple products)</button>
+        <button class="mode-btn" id="mode-single" onclick="setMode('single')">✏️ Single Product</button>
+      </div>
+
+      <div class="form-grid">
+        <!-- Bulk products textarea -->
+        <div class="form-group full" id="bulk-input-group">
+          <label>Product Names <span class="label-hint">— one per line</span></label>
+          <textarea id="products-bulk" rows="5" placeholder="Wireless Bluetooth Headphones&#10;Leather Laptop Bag&#10;Stainless Steel Water Bottle&#10;Bamboo Desk Organizer"></textarea>
+        </div>
+        <!-- Single product input -->
+        <div class="form-group full" id="single-input-group" style="display:none;">
+          <label>Product Name</label>
+          <input type="text" id="product-single" placeholder="e.g. Wireless Bluetooth Headphones" />
+        </div>
+
+        <div class="form-group">
+          <label>Category / Niche</label>
+          <input type="text" id="category" placeholder="e.g. Electronics, Home Decor, Fashion" />
+        </div>
+        <div class="form-group">
+          <label>Platform</label>
+          <select id="platform">
+            <option value="Shopify">Shopify</option>
+            <option value="WooCommerce">WooCommerce</option>
+            <option value="Amazon">Amazon</option>
+            <option value="General">General / Other</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label>Key Features <span class="label-hint">— comma separated</span></label>
+          <input type="text" id="features" placeholder="e.g. premium materials, fast shipping, 2-year warranty, eco-friendly" />
+        </div>
+
+        <div class="form-group">
+          <label>Brand Voice</label>
+          <select id="voice">
+            <option value="professional">Professional</option>
+            <option value="casual">Casual & Friendly</option>
+            <option value="luxury">Luxury & Premium</option>
+            <option value="technical">Technical</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Output Length</label>
+          <select id="length">
+            <option value="short">Short (~50 words)</option>
+            <option value="medium" selected>Medium (~150 words)</option>
+            <option value="long">Long (~300 words)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="generate-bar">
+        <button class="btn-generate" id="generate-btn" onclick="generate()">Generate Descriptions ✨</button>
+        <span class="free-note" id="free-note">First 3 products free</span>
+      </div>
+
+      <div class="loader" id="loader"><div class="spinner"></div><span id="loader-text">Analyzing your products…</span></div>
+      <div class="error-box" id="error-box"></div>
+
+      <div class="paywall" id="paywall">
+        <h3>Unlock Unlimited Products</h3>
+        <p>You've used your 3 free descriptions. Get unlimited bulk generation for your entire catalog.</p>
+        <div class="price-row">$19</div>
+        <div class="price-sub">/ month — unlimited products</div>
+        <a class="btn-pay" href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">Get Unlimited Access →</a>
+      </div>
+
+      <div class="results-section" id="results-section">
+        <div class="results-header">
+          <span class="results-title" id="results-title">0 descriptions generated</span>
+          <div class="results-actions">
+            <button class="btn-action" onclick="copyAll()">📋 Copy All</button>
+            <button class="btn-action primary" onclick="downloadCSV()">⬇ Download CSV</button>
+          </div>
+        </div>
+        <div id="cards-container"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Part of the <a href="/" style="color:var(--accent);text-decoration:none;">AI Tools Suite</a> — Powered by Claude AI</p>
+  </footer>
+
+  <script>
+    const PAYHIP_URL = "https://payhip.com/b/gFaqD";
+    const FREE_LIMIT = 3;
+    let usedCount = parseInt(localStorage.getItem("prodesc_used") ?? "0");
+    let currentMode = "bulk";
+    let lastDescriptions = [];
+
+    function updateNote() {
+      const el = document.getElementById("free-note");
+      const remaining = Math.max(0, FREE_LIMIT - usedCount);
+      if (remaining === 0) {
+        el.textContent = "Free limit reached — upgrade for unlimited";
+        el.style.color = "#f87171";
+      } else {
+        el.textContent = remaining === FREE_LIMIT
+          ? `First ${FREE_LIMIT} products free`
+          : `${remaining} free product${remaining !== 1 ? "s" : ""} remaining`;
+        el.style.color = "";
+      }
+    }
+    updateNote();
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById("mode-bulk").classList.toggle("active", mode === "bulk");
+      document.getElementById("mode-single").classList.toggle("active", mode === "single");
+      document.getElementById("bulk-input-group").style.display = mode === "bulk" ? "" : "none";
+      document.getElementById("single-input-group").style.display = mode === "single" ? "" : "none";
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("error-box");
+      el.textContent = msg;
+      el.classList.add("visible");
+      setTimeout(() => el.classList.remove("visible"), 7000);
+    }
+
+    function getProductList() {
+      if (currentMode === "single") {
+        const v = document.getElementById("product-single").value.trim();
+        return v ? [v] : [];
+      }
+      return document.getElementById("products-bulk").value
+        .split("\n")
+        .map(l => l.trim())
+        .filter(Boolean);
+    }
+
+    function renderCards(descriptions) {
+      const container = document.getElementById("cards-container");
+      container.innerHTML = "";
+      descriptions.forEach((d, i) => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.dataset.index = i;
+        const bulletsHtml = Array.isArray(d.bullets)
+          ? `<ul class="bullets-list">${d.bullets.map(b => `<li>${escHtml(b)}</li>`).join("")}</ul>`
+          : `<div class="field-content">${escHtml(d.bullets || "")}</div>`;
+        const kwHtml = Array.isArray(d.keywords)
+          ? `<div class="keywords-wrap">${d.keywords.map(k => `<span class="kw-chip">${escHtml(k)}</span>`).join("")}</div>`
+          : `<div class="field-content">${escHtml(d.keywords || "")}</div>`;
+
+        card.innerHTML = `
+          <div class="product-card-header">
+            <span class="product-card-name">${escHtml(d.name)}</span>
+            <button class="btn-copy-card" onclick="copyCard(${i})">📋 Copy</button>
+          </div>
+          <div class="product-card-body">
+            <div class="field-block">
+              <div class="field-label">Headline</div>
+              <div class="field-content headline">${escHtml(d.headline || "")}</div>
+            </div>
+            <div class="field-block">
+              <div class="field-label">Description</div>
+              <div class="field-content">${escHtml(d.body || "")}</div>
+            </div>
+            <div class="field-block">
+              <div class="field-label">Bullet Points</div>
+              ${bulletsHtml}
+            </div>
+            <div class="field-block">
+              <div class="field-label">SEO Keywords</div>
+              ${kwHtml}
+            </div>
+          </div>`;
+        container.appendChild(card);
+      });
+    }
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    function copyCard(i) {
+      const d = lastDescriptions[i];
+      if (!d) return;
+      const bullets = Array.isArray(d.bullets) ? d.bullets.map(b => `• ${b}`).join("\n") : (d.bullets || "");
+      const keywords = Array.isArray(d.keywords) ? d.keywords.join(", ") : (d.keywords || "");
+      const text = `${d.name}\n\nHeadline: ${d.headline}\n\nDescription:\n${d.body}\n\nBullet Points:\n${bullets}\n\nKeywords: ${keywords}`;
+      navigator.clipboard.writeText(text).then(() => {
+        const btns = document.querySelectorAll(".btn-copy-card");
+        const btn = btns[i];
+        if (btn) { btn.textContent = "✅ Copied!"; setTimeout(() => { btn.textContent = "📋 Copy"; }, 2000); }
+      });
+    }
+
+    function copyAll() {
+      const text = lastDescriptions.map(d => {
+        const bullets = Array.isArray(d.bullets) ? d.bullets.map(b => `• ${b}`).join("\n") : (d.bullets || "");
+        const keywords = Array.isArray(d.keywords) ? d.keywords.join(", ") : (d.keywords || "");
+        return `===== ${d.name} =====\nHeadline: ${d.headline}\n\nDescription:\n${d.body}\n\nBullet Points:\n${bullets}\n\nKeywords: ${keywords}`;
+      }).join("\n\n");
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        btn.textContent = "✅ Copied All!";
+        setTimeout(() => { btn.textContent = "📋 Copy All"; }, 2000);
+      });
+    }
+
+    function downloadCSV() {
+      if (!lastDescriptions.length) return;
+      const rows = [["Product Name", "Headline", "Description", "Bullet Points", "SEO Keywords"]];
+      lastDescriptions.forEach(d => {
+        const bullets = Array.isArray(d.bullets) ? d.bullets.join(" | ") : (d.bullets || "");
+        const keywords = Array.isArray(d.keywords) ? d.keywords.join(", ") : (d.keywords || "");
+        rows.push([d.name, d.headline || "", d.body || "", bullets, keywords]);
+      });
+      const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = "product-descriptions.csv"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    async function generate() {
+      const products = getProductList();
+      if (products.length === 0) {
+        showError(currentMode === "single" ? "Please enter a product name." : "Please enter at least one product name.");
+        return;
+      }
+
+      // Paywall check: count how many products we can generate
+      const remaining = Math.max(0, FREE_LIMIT - usedCount);
+      if (remaining === 0) {
+        document.getElementById("paywall").classList.add("visible");
+        document.getElementById("paywall").scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      // Limit to free remaining
+      const allowedProducts = products.slice(0, remaining);
+      const willPaywall = products.length > remaining;
+
+      document.getElementById("generate-btn").disabled = true;
+      document.getElementById("results-section").classList.remove("visible");
+      document.getElementById("error-box").classList.remove("visible");
+      document.getElementById("paywall").classList.remove("visible");
+
+      const loaderTexts = ["Analyzing your products…", "Crafting compelling descriptions…", "Optimizing for search…", "Writing bullet points…", "Almost done…"];
+      let li = 0;
+      document.getElementById("loader").classList.add("visible");
+      document.getElementById("loader-text").textContent = loaderTexts[0];
+      const loaderInterval = setInterval(() => {
+        li = (li + 1) % loaderTexts.length;
+        document.getElementById("loader-text").textContent = loaderTexts[li];
+      }, 1800);
+
+      try {
+        const res = await fetch("/api/product-desc", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            products: allowedProducts,
+            category: document.getElementById("category").value.trim() || "General",
+            features: document.getElementById("features").value.trim(),
+            voice: document.getElementById("voice").value,
+            length: document.getElementById("length").value,
+            platform: document.getElementById("platform").value,
+          }),
+        });
+        clearInterval(loaderInterval);
+        document.getElementById("loader").classList.remove("visible");
+
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Error ${res.status}`);
+        const data = await res.json();
+        const descriptions = data.descriptions || [];
+
+        // Update usage count
+        usedCount += allowedProducts.length;
+        localStorage.setItem("prodesc_used", usedCount.toString());
+        updateNote();
+
+        lastDescriptions = descriptions;
+        renderCards(descriptions);
+
+        const n = descriptions.length;
+        document.getElementById("results-title").textContent = `${n} description${n !== 1 ? "s" : ""} generated`;
+        document.getElementById("results-section").classList.add("visible");
+
+        if (willPaywall) {
+          document.getElementById("paywall").classList.add("visible");
+        }
+
+        document.getElementById("results-section").scrollIntoView({ behavior: "smooth", block: "start" });
+      } catch (err) {
+        clearInterval(loaderInterval);
+        document.getElementById("loader").classList.remove("visible");
+        showError("Error: " + err.message);
+      } finally {
+        document.getElementById("generate-btn").disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
