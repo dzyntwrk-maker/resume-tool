@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEO Writer AI — Generate Optimized Blog Articles</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0f1e; --surface: #111827; --border: #1f2937; --accent: #6366f1; --text: #f1f5f9; --muted: #64748b; --green: #10b981; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 14px; text-decoration: none; }
+    .nav-links a:hover { color: var(--text); }
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+    .app { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 24px 28px; }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } nav { padding: 16px 20px; } }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    textarea, input, select { background: #0d1425; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .15s; font-family: inherit; resize: vertical; }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+    .generate-bar { padding: 0 28px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .btn-generate { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+    .loader { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; padding: 20px 0; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-box { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; margin: 0 28px 16px; display: none; }
+    .error-box.visible { display: block; }
+    .output-section { padding: 0 28px 28px; display: none; }
+    .output-section.visible { display: block; }
+    .seo-score { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .score-chip { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .score-pass { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.25); }
+    .score-warn { background: rgba(245,158,11,.15); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); }
+    .output-card { background: #0d1425; border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+    .output-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--accent); margin-bottom: 10px; }
+    .output-text { font-size: 14px; line-height: 1.7; color: #cbd5e1; white-space: pre-wrap; }
+    .outline-list { list-style: none; }
+    .outline-h2 { font-size: 14px; font-weight: 700; color: var(--text); margin: 8px 0 4px; }
+    .outline-h3 { font-size: 13px; color: var(--muted); margin: 2px 0 2px 16px; }
+    .outline-h3::before { content: "↳ "; }
+    .output-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-copy { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s; }
+    .btn-copy:hover { border-color: var(--accent); }
+    .btn-download { background: var(--green); color: white; border: none; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); border: 1px solid rgba(99,102,241,.25); border-radius: 16px; padding: 28px; margin: 0 28px 28px; display: none; text-align: center; }
+    .paywall.visible { display: block; }
+    .paywall h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .paywall p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    .price-row { font-size: 36px; font-weight: 900; color: var(--accent); margin-bottom: 16px; }
+    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 60px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">AI Tools</a>
+    <div class="nav-links">
+      <a href="/">Resume</a>
+      <a href="/listing-generator.html">Listing Generator</a>
+      <a href="/seo-writer.html" style="color:var(--text)">SEO Writer</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="badge">SEO Content Writer</div>
+    <h1>Blog Articles That <span>Rank on Google</span></h1>
+    <p>Generate fully SEO-optimized blog posts with titles, meta tags, outlines, and full content in seconds.</p>
+  </div>
+
+  <div class="app">
+    <div class="app-card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Primary Keyword *</label>
+          <input type="text" id="keyword" placeholder="e.g. best project management tools" />
+        </div>
+        <div class="form-group">
+          <label>Secondary Keywords</label>
+          <input type="text" id="secondary" placeholder="e.g. team collaboration, productivity" />
+        </div>
+        <div class="form-group">
+          <label>Article Length</label>
+          <select id="length">
+            <option value="medium">Medium (~1,000 words)</option>
+            <option value="short">Short (~500 words)</option>
+            <option value="long">Long (~2,000 words)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Article Purpose</label>
+          <select id="purpose">
+            <option value="informational">Informational</option>
+            <option value="commercial">Commercial / Review</option>
+            <option value="transactional">Transactional / How-to</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Target Audience</label>
+          <input type="text" id="audience" placeholder="e.g. small business owners, beginners" />
+        </div>
+        <div class="form-group">
+          <label>Tone</label>
+          <select id="tone">
+            <option value="professional">Professional</option>
+            <option value="conversational">Conversational</option>
+            <option value="authoritative">Authoritative</option>
+            <option value="simple">Simple / Beginner-friendly</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="generate-bar">
+        <button class="btn-generate" id="generate-btn" onclick="generate()">Write Article ✨</button>
+        <span class="free-note" id="free-note">1 free article included</span>
+      </div>
+
+      <div class="loader" id="loader"><div class="spinner"></div><span id="loader-text">Researching keyword…</span></div>
+      <div class="error-box" id="error-box"></div>
+
+      <div class="paywall" id="paywall">
+        <h3>Unlock Unlimited Articles</h3>
+        <p>You've used your free article. Get 20 more for a one-time payment.</p>
+        <div class="price-row">$19</div>
+        <button class="btn-pay" onclick="window.open('https://payhip.com/b/gFaqD','_blank')">Get 20 Articles — $19 →</button>
+        <p style="margin-top:16px;font-size:12px;">Already purchased? <a href="/" style="color:var(--accent)">Enter access code on the main page</a></p>
+      </div>
+
+      <div class="output-section" id="output-section">
+        <div class="seo-score" id="seo-score"></div>
+
+        <div class="output-card">
+          <div class="output-label">SEO Title (H1)</div>
+          <div class="output-text" id="out-title"></div>
+          <div class="output-actions"><button class="btn-copy" onclick="copyEl('out-title',this)">📋 Copy</button></div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Meta Description</div>
+          <div class="output-text" id="out-meta"></div>
+          <div id="meta-length" style="font-size:11px;color:var(--muted);margin-top:6px;"></div>
+          <div class="output-actions"><button class="btn-copy" onclick="copyEl('out-meta',this)">📋 Copy</button></div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Article Outline</div>
+          <ul class="outline-list" id="out-outline"></ul>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Full Article</div>
+          <div class="output-text" id="out-article"></div>
+          <div class="output-actions">
+            <button class="btn-copy" onclick="copyEl('out-article',this)">📋 Copy</button>
+            <button class="btn-download" onclick="downloadArticle()">⬇ Download .txt</button>
+          </div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">FAQ Section</div>
+          <div class="output-text" id="out-faqs"></div>
+          <div class="output-actions"><button class="btn-copy" onclick="copyEl('out-faqs',this)">📋 Copy</button></div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Call to Action</div>
+          <div class="output-text" id="out-cta"></div>
+          <div class="output-actions"><button class="btn-copy" onclick="copyEl('out-cta',this)">📋 Copy</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Part of the <a href="/" style="color:var(--accent);text-decoration:none;">AI Tools Suite</a> — Powered by Claude AI</p>
+  </footer>
+
+  <script>
+    let usesRemaining = parseInt(localStorage.getItem("seowriter_uses") ?? "1");
+    let lastKeyword = "";
+
+    function updateNote() {
+      const n = document.getElementById("free-note");
+      if (usesRemaining <= 0) { n.textContent = "No articles left — unlock more below"; n.style.color = "#f87171"; }
+      else { n.textContent = usesRemaining === 1 ? "1 free article remaining" : `${usesRemaining} articles remaining`; }
+    }
+    updateNote();
+
+    function showError(msg) {
+      const el = document.getElementById("error-box");
+      el.textContent = msg; el.classList.add("visible");
+      setTimeout(() => el.classList.remove("visible"), 6000);
+    }
+
+    function copyEl(id, btn) {
+      navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
+        btn.textContent = "✅ Copied!"; setTimeout(() => { btn.textContent = "📋 Copy"; }, 2000);
+      });
+    }
+
+    function downloadArticle() {
+      const title = document.getElementById("out-title").textContent;
+      const article = document.getElementById("out-article").textContent;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([`${title}\n\n${article}`], { type: "text/plain" }));
+      a.download = `article-${lastKeyword.replace(/\s+/g,"-")}.txt`;
+      a.click();
+    }
+
+    async function generate() {
+      const keyword = document.getElementById("keyword").value.trim();
+      if (!keyword) { showError("Please enter a primary keyword."); return; }
+
+      if (usesRemaining <= 0) {
+        document.getElementById("paywall").classList.add("visible");
+        document.getElementById("paywall").scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      lastKeyword = keyword;
+      document.getElementById("generate-btn").disabled = true;
+      document.getElementById("output-section").classList.remove("visible");
+      document.getElementById("error-box").classList.remove("visible");
+      document.getElementById("paywall").classList.remove("visible");
+
+      const loaderTexts = ["Researching keyword…", "Building article outline…", "Writing content…", "Adding SEO optimization…", "Polishing article…"];
+      let li = 0;
+      document.getElementById("loader").classList.add("visible");
+      document.getElementById("loader-text").textContent = loaderTexts[0];
+      const loaderInterval = setInterval(() => { li = (li + 1) % loaderTexts.length; document.getElementById("loader-text").textContent = loaderTexts[li]; }, 2000);
+
+      try {
+        const res = await fetch("/api/seo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            keyword,
+            secondary: document.getElementById("secondary").value.trim(),
+            length: document.getElementById("length").value,
+            audience: document.getElementById("audience").value.trim(),
+            purpose: document.getElementById("purpose").value,
+            tone: document.getElementById("tone").value,
+          }),
+        });
+
+        clearInterval(loaderInterval);
+        document.getElementById("loader").classList.remove("visible");
+        if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `Error ${res.status}`);
+        const data = await res.json();
+
+        usesRemaining--;
+        localStorage.setItem("seowriter_uses", usesRemaining.toString());
+        updateNote();
+
+        document.getElementById("out-title").textContent = data.title || "";
+        document.getElementById("out-meta").textContent = data.metaDesc || "";
+
+        const metaLen = (data.metaDesc || "").length;
+        const metaLenEl = document.getElementById("meta-length");
+        metaLenEl.textContent = `${metaLen}/155 characters`;
+        metaLenEl.style.color = metaLen > 155 ? "#ef4444" : metaLen > 120 ? "#10b981" : "#64748b";
+
+        // Outline
+        const outlineEl = document.getElementById("out-outline");
+        outlineEl.innerHTML = (data.outline || []).map(sec =>
+          `<li><div class="outline-h2">${sec.h2}</div>${(sec.h3s || []).map(h3 => `<div class="outline-h3">${h3}</div>`).join("")}</li>`
+        ).join("");
+
+        document.getElementById("out-article").textContent = data.article || "";
+
+        // FAQs
+        const faqText = Array.isArray(data.faqs)
+          ? data.faqs.map(f => `Q: ${f.q}\nA: ${f.a}`).join("\n\n")
+          : (data.faqs || "");
+        document.getElementById("out-faqs").textContent = faqText;
+        document.getElementById("out-cta").textContent = data.cta || "";
+
+        // SEO score chips
+        const scores = [
+          { label: "Keyword in title", pass: (data.title || "").toLowerCase().includes(keyword.toLowerCase()) },
+          { label: "Meta length OK", pass: metaLen >= 120 && metaLen <= 155 },
+          { label: "Has H2 sections", pass: (data.outline || []).length >= 3 },
+          { label: "Has FAQ section", pass: (data.faqs || []).length > 0 },
+          { label: "Has CTA", pass: !!(data.cta) },
+        ];
+        document.getElementById("seo-score").innerHTML = scores.map(s =>
+          `<span class="score-chip ${s.pass ? "score-pass" : "score-warn"}">${s.pass ? "✓" : "○"} ${s.label}</span>`
+        ).join("");
+
+        document.getElementById("output-section").classList.add("visible");
+      } catch (err) {
+        clearInterval(loaderInterval);
+        document.getElementById("loader").classList.remove("visible");
+        showError("Error: " + err.message);
+      } finally {
+        document.getElementById("generate-btn").disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

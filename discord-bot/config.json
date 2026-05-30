@@ -1,0 +1,67 @@
+{
+  "_comment_token": "Your bot token from https://discord.com/developers/applications — NEVER share this",
+  "token": "YOUR_BOT_TOKEN_HERE",
+
+  "_comment_prefix": "Command prefix for text commands",
+  "prefix": "!",
+
+  "_comment_welcome": "Welcome message settings",
+  "welcome": {
+    "enabled": true,
+    "_comment_channelId": "Right-click your welcome channel > Copy Channel ID (enable Developer Mode first)",
+    "channelId": "YOUR_WELCOME_CHANNEL_ID",
+    "message": "Welcome to the server, {user}! We're glad to have you.",
+    "embed": {
+      "enabled": true,
+      "color": "#5865F2",
+      "title": "Welcome to {server}!",
+      "description": "Hey {user}, welcome aboard! Make sure to read the rules and enjoy your stay.",
+      "thumbnailUrl": "",
+      "_comment_thumbnailUrl": "Leave empty to use the new member's avatar",
+      "footer": "Member #{memberCount}"
+    }
+  },
+
+  "_comment_reactionRoles": "Map emoji to role IDs for reaction-based role assignment",
+  "reactionRoles": {
+    "enabled": true,
+    "_comment_messageId": "The ID of the message users will react to",
+    "messageId": "YOUR_REACTION_ROLE_MESSAGE_ID",
+    "_comment_channelId": "The channel that message lives in",
+    "channelId": "YOUR_REACTION_ROLE_CHANNEL_ID",
+    "_comment_map": "Emoji (unicode or :name:) mapped to role IDs",
+    "map": {
+      "🎮": "GAMER_ROLE_ID",
+      "🎵": "MUSIC_ROLE_ID",
+      "🎨": "ART_ROLE_ID",
+      "📢": "ANNOUNCEMENTS_ROLE_ID"
+    }
+  },
+
+  "_comment_moderation": "Moderation settings",
+  "moderation": {
+    "_comment_adminRoleId": "Role ID that can use !warn and !kick",
+    "adminRoleId": "YOUR_ADMIN_ROLE_ID",
+    "_comment_logChannelId": "Channel where mod actions are logged. Leave empty to disable",
+    "logChannelId": "YOUR_MOD_LOG_CHANNEL_ID",
+    "_comment_maxWarnings": "Warnings before automatic kick",
+    "maxWarnings": 3
+  },
+
+  "_comment_autoResponses": "Trigger words and the bot's automatic reply. Case-insensitive.",
+  "autoResponses": {
+    "hello": "Hey there! 👋 How can I help you today?",
+    "rules": "Please check out the #rules channel!",
+    "invite": "You can invite friends using: https://discord.gg/YOUR_INVITE",
+    "website": "Visit our website at https://yourwebsite.com"
+  },
+
+  "_comment_poll": "Poll command settings",
+  "poll": {
+    "color": "#FEE75C",
+    "_comment_maxOptions": "Maximum number of poll options (max 9 due to emoji limits)",
+    "maxOptions": 9,
+    "_comment_allowedChannels": "Channel IDs where !poll is allowed. Empty array = all channels",
+    "allowedChannels": []
+  }
+}

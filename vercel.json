@@ -1,6 +1,8 @@
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/listing-generator", "destination": "/listing-generator.html" },
+    { "source": "/seo-writer", "destination": "/seo-writer.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
