@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmailSequenceAI — Nurture Sequences for Small Businesses</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --border: #1f2937;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+
+    /* Nav */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 14px; text-decoration: none; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-decoration: none; transition: background .2s; }
+    .nav-cta:hover { background: #4f46e5; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 64px 20px 48px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 54px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 520px; margin: 0 auto 32px; line-height: 1.6; }
+
+    /* Stats */
+    .stats { display: flex; justify-content: center; gap: 60px; padding: 32px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 40px 60px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 800; color: var(--accent); }
+    .stat-label { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    /* App */
+    .app { max-width: 880px; margin: 0 auto 80px; padding: 0 20px; }
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .app-header { padding: 24px 28px 4px; display: flex; align-items: center; gap: 12px; }
+    .step-badge { background: var(--accent); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .app-header h2 { font-size: 19px; font-weight: 700; }
+
+    /* Form */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 28px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    textarea, input, select {
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .15s;
+      font-family: inherit;
+      resize: vertical;
+    }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+
+    /* Generate bar */
+    .generate-bar { padding: 4px 28px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .btn-generate { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 13px 32px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s; display: flex; align-items: center; gap: 8px; }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+
+    /* Loader */
+    .loader { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; padding: 20px 28px; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .error-box { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; margin: 0 28px 16px; display: none; }
+    .error-box.visible { display: block; }
+
+    /* Output */
+    .output-section { padding: 0 28px 28px; display: none; }
+    .output-section.visible { display: block; }
+
+    .output-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; padding-top: 4px; }
+    .output-title { font-size: 16px; font-weight: 700; }
+    .toolbar-actions { display: flex; gap: 8px; }
+
+    .btn-action { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s; }
+    .btn-action:hover { border-color: var(--accent); }
+    .btn-action.accent { background: rgba(99,102,241,.12); border-color: rgba(99,102,241,.4); color: #a5b4fc; }
+    .btn-action.accent:hover { border-color: var(--accent); }
+
+    /* Email cards */
+    .email-cards { display: flex; flex-direction: column; gap: 16px; }
+
+    .email-card {
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .email-card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    .email-card-header:hover { background: rgba(255,255,255,.02); }
+    .day-badge {
+      background: rgba(99,102,241,.15);
+      color: #a5b4fc;
+      border: 1px solid rgba(99,102,241,.3);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .email-card-meta { flex: 1; min-width: 0; }
+    .email-subject { font-size: 15px; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+    .email-preview { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .expand-icon { color: var(--muted); font-size: 18px; flex-shrink: 0; transition: transform .2s; margin-top: 2px; }
+    .email-card.expanded .expand-icon { transform: rotate(180deg); }
+
+    .email-card-body { display: none; padding: 20px; }
+    .email-card.expanded .email-card-body { display: block; }
+
+    .email-meta-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .meta-chip { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 12px; color: var(--muted); }
+    .meta-chip strong { color: var(--text); }
+
+    .email-body-text {
+      font-size: 14px;
+      line-height: 1.75;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .card-actions { display: flex; gap: 8px; }
+
+    /* Paywall */
+    .paywall-overlay {
+      position: relative;
+      margin-top: 20px;
+    }
+    .paywall-blur {
+      filter: blur(4px);
+      pointer-events: none;
+      user-select: none;
+      opacity: .5;
+    }
+    .paywall-card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--surface);
+      border: 1px solid rgba(99,102,241,.4);
+      border-radius: 14px;
+      padding: 28px 32px;
+      text-align: center;
+      width: min(420px, 90%);
+      z-index: 5;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    }
+    .paywall-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+    .paywall-card p { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+    .btn-unlock {
+      display: inline-block;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      transition: opacity .2s;
+    }
+    .btn-unlock:hover { opacity: .88; }
+    .paywall-note { color: var(--muted); font-size: 12px; margin-top: 12px; }
+
+    /* Sequence type descriptions */
+    .seq-hint { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* Features section */
+    .features { max-width: 880px; margin: 0 auto 80px; padding: 0 20px; }
+    .features h2 { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 40px; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .feature-icon { font-size: 24px; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .feature-card p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      nav { padding: 14px 20px; }
+      .nav-links { gap: 12px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .stats { gap: 24px; margin: 0 20px 40px; }
+      .form-grid, .generate-bar, .app-header, .output-section { padding-left: 16px; padding-right: 16px; }
+      .email-card-header { flex-wrap: wrap; }
+      .toolbar-actions { flex-wrap: wrap; }
+      .paywall-card { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">ToolsAI</a>
+  <div class="nav-links">
+    <a href="/listing-generator.html">Listing Generator</a>
+    <a href="/seo-writer.html">SEO Writer</a>
+    <a href="https://payhip.com/b/gFaqD" class="nav-cta" target="_blank">Unlock All</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge">AI Email Copywriter</div>
+  <h1>Email nurture sequences<br><span>that actually convert</span></h1>
+  <p>Generate complete, ready-to-send email sequences for your business — welcome flows, sales campaigns, onboarding, and more.</p>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num">7</div><div class="stat-label">Sequence Types</div></div>
+  <div class="stat"><div class="stat-num">42%</div><div class="stat-label">Avg. Open Rate Uplift</div></div>
+  <div class="stat"><div class="stat-num">30s</div><div class="stat-label">To Generate</div></div>
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Ready to Send</div></div>
+</div>
+
+<div class="app">
+  <div class="app-card">
+    <div class="app-header">
+      <div class="step-badge">1</div>
+      <h2>Tell us about your business</h2>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Business Type</label>
+        <input type="text" id="businessType" placeholder="e.g. Online coaching, SaaS, eCommerce" />
+      </div>
+      <div class="form-group">
+        <label>Product / Service Name</label>
+        <input type="text" id="productName" placeholder="e.g. The Growth Blueprint" />
+      </div>
+      <div class="form-group">
+        <label>Sequence Goal</label>
+        <select id="sequenceType">
+          <option value="welcome">Welcome — Onboard new subscribers</option>
+          <option value="sales">Sales — Convert leads to customers</option>
+          <option value="onboarding">Onboarding — Guide new customers</option>
+          <option value="nurture">Nurture — Build long-term relationship</option>
+          <option value="reengagement">Re-engagement — Win back inactive users</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Number of Emails</label>
+        <select id="emailCount">
+          <option value="3">3 emails</option>
+          <option value="5" selected>5 emails</option>
+          <option value="7">7 emails</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Target Audience</label>
+        <input type="text" id="audience" placeholder="e.g. Freelance designers, busy moms, early-stage startup founders" />
+      </div>
+      <div class="form-group full">
+        <label>Key Selling Points</label>
+        <textarea id="sellingPoints" rows="4" placeholder="List your top 3–5 selling points, one per line:&#10;• Saves 5+ hours per week&#10;• No technical skills required&#10;• 30-day money-back guarantee&#10;• Used by 2,000+ customers"></textarea>
+      </div>
+    </div>
+
+    <div class="generate-bar">
+      <button class="btn-generate" id="generateBtn" onclick="generate()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Generate Sequence
+      </button>
+      <span class="free-note">1 free sequence — then <a href="https://payhip.com/b/gFaqD" target="_blank" style="color:var(--accent)">unlock unlimited</a></span>
+    </div>
+
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <span>Writing your email sequence...</span>
+    </div>
+    <div class="error-box" id="errorBox"></div>
+
+    <div class="output-section" id="outputSection">
+      <div class="output-toolbar">
+        <div class="output-title" id="outputTitle">Your Email Sequence</div>
+        <div class="toolbar-actions">
+          <button class="btn-action" onclick="downloadTxt()">Download .txt</button>
+          <button class="btn-action accent" onclick="copyAll()">Copy All Emails</button>
+        </div>
+      </div>
+      <div class="email-cards" id="emailCards"></div>
+      <div id="paywallWrapper"></div>
+    </div>
+  </div>
+</div>
+
+<div class="features">
+  <h2>Built for real businesses</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🎯</div>
+      <h3>Goal-driven sequences</h3>
+      <p>Each sequence type is strategically structured — sales emails build urgency, nurture emails build trust.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✍️</div>
+      <h3>Human-sounding copy</h3>
+      <p>No robotic AI fluff. Each email is written like a real person — conversational, warm, and persuasive.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📬</div>
+      <h3>Complete and ready</h3>
+      <p>Subject line, preview text, and full body — everything you need to paste straight into your email tool.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🏪</div>
+      <h3>Any business type</h3>
+      <p>Coaches, SaaS, eCommerce, agencies, creators — works for any small business selling anything.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+let used = false;
+let lastEmails = [];
+let lastMeta = {};
+
+function generate() {
+  const businessType = document.getElementById('businessType').value.trim();
+  const productName = document.getElementById('productName').value.trim();
+  const sequenceType = document.getElementById('sequenceType').value;
+  const emailCount = document.getElementById('emailCount').value;
+  const audience = document.getElementById('audience').value.trim();
+  const sellingPoints = document.getElementById('sellingPoints').value.trim();
+
+  if (!productName) return showError('Please enter your product or service name.');
+  if (!audience) return showError('Please describe your target audience.');
+
+  if (used) {
+    showPaywall();
+    return;
+  }
+
+  clearError();
+  showLoader(true);
+  document.getElementById('outputSection').classList.remove('visible');
+
+  const seqLabels = {
+    welcome: 'Welcome Sequence',
+    sales: 'Sales Sequence',
+    onboarding: 'Onboarding Sequence',
+    nurture: 'Nurture Sequence',
+    reengagement: 'Re-engagement Sequence',
+  };
+
+  lastMeta = { businessType, productName, sequenceType, emailCount, audience, sellingPoints };
+
+  fetch('/api/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ businessType, productName, sequenceType, emailCount, audience, sellingPoints }),
+  })
+    .then(r => r.json())
+    .then(data => {
+      showLoader(false);
+      if (data.error) { showError(data.error); return; }
+      lastEmails = data.emails || [];
+      renderEmails(lastEmails, seqLabels[sequenceType] || 'Email Sequence', productName, parseInt(emailCount));
+      used = true;
+    })
+    .catch(() => {
+      showLoader(false);
+      showError('Something went wrong. Please try again.');
+    });
+}
+
+function renderEmails(emails, seqLabel, productName, count) {
+  document.getElementById('outputTitle').textContent = `${seqLabel} for ${productName}`;
+  const container = document.getElementById('emailCards');
+  container.innerHTML = '';
+  document.getElementById('paywallWrapper').innerHTML = '';
+
+  // Show first 2 free, rest behind paywall if used
+  const freeCount = 2;
+  const showFull = emails.slice(0, freeCount);
+  const showLocked = emails.slice(freeCount);
+
+  showFull.forEach((email, i) => {
+    container.appendChild(buildEmailCard(email, i));
+  });
+
+  if (showLocked.length > 0) {
+    const wrapper = document.getElementById('paywallWrapper');
+    wrapper.innerHTML = '';
+    const blurDiv = document.createElement('div');
+    blurDiv.className = 'paywall-blur';
+    showLocked.forEach((email, i) => {
+      blurDiv.appendChild(buildEmailCard(email, freeCount + i));
+    });
+    const overlay = document.createElement('div');
+    overlay.className = 'paywall-overlay';
+    overlay.appendChild(blurDiv);
+
+    const card = document.createElement('div');
+    card.className = 'paywall-card';
+    card.innerHTML = `
+      <h3>Unlock ${showLocked.length} more email${showLocked.length > 1 ? 's' : ''}</h3>
+      <p>You've used your free sequence. Upgrade to unlock all ${count} emails, unlimited sequences, and every tool on this site.</p>
+      <a href="https://payhip.com/b/gFaqD" target="_blank" class="btn-unlock">Unlock Unlimited Access</a>
+      <div class="paywall-note">One-time payment — lifetime access</div>
+    `;
+    overlay.appendChild(card);
+    wrapper.appendChild(overlay);
+  }
+
+  document.getElementById('outputSection').classList.add('visible');
+  document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildEmailCard(email, index) {
+  const card = document.createElement('div');
+  card.className = 'email-card';
+  if (index === 0) card.classList.add('expanded');
+
+  const dayLabel = email.day === 0 ? 'Day 0 (Immediate)' : `Day ${email.day}`;
+
+  card.innerHTML = `
+    <div class="email-card-header" onclick="toggleCard(this.parentElement)">
+      <div class="day-badge">${dayLabel}</div>
+      <div class="email-card-meta">
+        <div class="email-subject">${escHtml(email.subject)}</div>
+        <div class="email-preview">${escHtml(email.preview)}</div>
+      </div>
+      <div class="expand-icon">&#8964;</div>
+    </div>
+    <div class="email-card-body">
+      <div class="email-meta-row">
+        <div class="meta-chip"><strong>Subject:</strong> ${escHtml(email.subject)}</div>
+        <div class="meta-chip"><strong>Preview:</strong> ${escHtml(email.preview)}</div>
+      </div>
+      <div class="email-body-text">${escHtml(email.body)}</div>
+      <div class="card-actions">
+        <button class="btn-action" onclick="copyEmail(this, ${index})">Copy Email</button>
+        <button class="btn-action" onclick="copySubject(this, ${index})">Copy Subject</button>
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+function toggleCard(card) {
+  card.classList.toggle('expanded');
+}
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyEmail(btn, index) {
+  const email = lastEmails[index];
+  if (!email) return;
+  const text = `Subject: ${email.subject}\nPreview: ${email.preview}\n\n${email.body}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.borderColor = ''; btn.style.color = ''; }, 1800);
+  });
+}
+
+function copySubject(btn, index) {
+  const email = lastEmails[index];
+  if (!email) return;
+  navigator.clipboard.writeText(email.subject).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.style.borderColor = 'var(--green)';
+    btn.style.color = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.borderColor = ''; btn.style.color = ''; }, 1800);
+  });
+}
+
+function copyAll() {
+  if (!lastEmails.length) return;
+  const seqLabel = document.getElementById('outputTitle').textContent;
+  const text = `${seqLabel}\n${'='.repeat(seqLabel.length)}\n\n` +
+    lastEmails.map((email, i) => {
+      const dayLabel = email.day === 0 ? 'Day 0 (Immediate)' : `Day ${email.day}`;
+      return `--- Email ${i + 1}: ${dayLabel} ---\nSubject: ${email.subject}\nPreview: ${email.preview}\n\n${email.body}`;
+    }).join('\n\n\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.btn-action.accent');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 1800);
+  });
+}
+
+function downloadTxt() {
+  if (!lastEmails.length) return;
+  const seqLabel = document.getElementById('outputTitle').textContent;
+  const text = `${seqLabel}\n${'='.repeat(seqLabel.length)}\nGenerated by EmailSequenceAI\n\n` +
+    lastEmails.map((email, i) => {
+      const dayLabel = email.day === 0 ? 'Day 0 (Immediate)' : `Day ${email.day}`;
+      return `--- Email ${i + 1}: ${dayLabel} ---\nSubject: ${email.subject}\nPreview Text: ${email.preview}\n\n${email.body}`;
+    }).join('\n\n\n');
+
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(lastMeta.productName || 'email-sequence').toLowerCase().replace(/\s+/g,'-')}-sequence.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showPaywall() {
+  const paywallHtml = `
+    <div style="background:var(--surface);border:1px solid rgba(99,102,241,.4);border-radius:14px;padding:32px;text-align:center;margin-top:24px;">
+      <h3 style="font-size:22px;font-weight:800;margin-bottom:12px;">You've used your free sequence</h3>
+      <p style="color:var(--muted);font-size:14px;line-height:1.6;max-width:360px;margin:0 auto 20px;">Upgrade once and generate unlimited email sequences — plus access to all tools on this site.</p>
+      <a href="https://payhip.com/b/gFaqD" target="_blank" class="btn-unlock" style="display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white;text-decoration:none;padding:13px 30px;border-radius:10px;font-size:15px;font-weight:700;">Unlock Unlimited Access</a>
+      <div style="color:var(--muted);font-size:12px;margin-top:12px;">One-time payment — lifetime access</div>
+    </div>
+  `;
+  document.getElementById('outputSection').classList.add('visible');
+  document.getElementById('paywallWrapper').innerHTML = paywallHtml;
+  document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+function showLoader(show) {
+  document.getElementById('loader').classList.toggle('visible', show);
+  document.getElementById('generateBtn').disabled = show;
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+function clearError() {
+  document.getElementById('errorBox').classList.remove('visible');
+}
+</script>
+</body>
+</html>

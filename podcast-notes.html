@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Podcast Show Notes Generator — AI-Powered in Seconds</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --border: #1f2937;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+
+    /* Nav */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-link { color: var(--muted); font-size: 14px; text-decoration: none; transition: color .15s; }
+    .nav-link:hover { color: var(--text); }
+    .nav-cta { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-decoration: none; transition: background .2s; }
+    .nav-cta:hover { background: #4f46e5; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 72px 20px 52px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 24px; letter-spacing: .3px; }
+    .hero h1 { font-size: clamp(32px, 5.5vw, 58px); font-weight: 900; line-height: 1.1; margin-bottom: 20px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 18px; max-width: 520px; margin: 0 auto 36px; line-height: 1.6; }
+
+    /* Stats */
+    .stats { display: flex; justify-content: center; gap: 60px; padding: 36px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 40px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 30px; font-weight: 800; color: var(--accent); }
+    .stat-label { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+    /* App Card */
+    .app { max-width: 920px; margin: 56px auto; padding: 0 20px; }
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .app-header { padding: 24px 28px 0; display: flex; align-items: center; gap: 12px; }
+    .step-badge { background: var(--accent); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .app-header h2 { font-size: 20px; font-weight: 700; }
+
+    /* Form */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 24px 28px; }
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .stats { gap: 30px; margin: 0 20px; }
+      nav { padding: 16px 20px; }
+      .nav-links { gap: 14px; }
+      .nav-link { display: none; }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .label-optional { font-size: 10px; font-weight: 400; color: var(--muted); text-transform: none; letter-spacing: 0; margin-left: 4px; opacity: .7; }
+    textarea, input, select {
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .15s;
+      font-family: inherit;
+      resize: vertical;
+    }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    .char-count { font-size: 11px; color: var(--muted); text-align: right; margin-top: 2px; }
+    .input-hint { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+    .divider-label { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
+    .divider-label::before, .divider-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    /* Generate bar */
+    .generate-bar { padding: 0 28px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .btn-generate { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; display: flex; align-items: center; gap: 8px; }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+
+    /* Loader */
+    .loader { display: none; padding: 20px 28px 28px; align-items: center; gap: 14px; color: var(--muted); font-size: 14px; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .error-box { margin: 0 28px 24px; padding: 12px 16px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; color: #fca5a5; font-size: 14px; display: none; }
+    .error-box.visible { display: block; }
+
+    /* Output */
+    .output-section { padding: 0 28px 28px; display: none; }
+    .output-section.visible { display: block; }
+    .output-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; overflow-x: auto; }
+    .output-tab { padding: 10px 18px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); border-bottom: 2px solid transparent; transition: color .15s; white-space: nowrap; }
+    .output-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .output-content { display: none; }
+    .output-content.active { display: block; }
+    .output-box {
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      min-height: 160px;
+      color: #cbd5e1;
+    }
+    .output-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .btn-copy { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 18px; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s, color .15s; }
+    .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-copy.copied { border-color: var(--green); color: var(--green); }
+    .btn-download { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 18px; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s, color .15s; }
+    .btn-download:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    /* Timestamps list */
+    .timestamps-list { display: flex; flex-direction: column; gap: 8px; }
+    .timestamp-row { display: flex; gap: 14px; align-items: baseline; background: #0d1425; border: 1px solid var(--border); border-radius: 7px; padding: 10px 14px; font-size: 14px; }
+    .ts-time { font-family: monospace; color: var(--accent); font-size: 13px; font-weight: 700; flex-shrink: 0; min-width: 52px; }
+    .ts-label { color: #cbd5e1; line-height: 1.5; }
+
+    /* Takeaways list */
+    .takeaways-list { display: flex; flex-direction: column; gap: 8px; }
+    .takeaway-row { display: flex; gap: 12px; align-items: flex-start; background: #0d1425; border: 1px solid var(--border); border-radius: 7px; padding: 11px 14px; font-size: 14px; line-height: 1.6; color: #cbd5e1; }
+    .takeaway-bullet { color: var(--accent); font-weight: 800; flex-shrink: 0; margin-top: 1px; }
+
+    /* Resources list */
+    .resources-list { display: flex; flex-direction: column; gap: 8px; }
+    .resource-row { background: #0d1425; border: 1px solid var(--border); border-radius: 7px; padding: 11px 14px; font-size: 14px; line-height: 1.6; color: #cbd5e1; }
+
+    /* Paywall */
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); border: 1px solid rgba(99,102,241,.25); border-radius: 16px; padding: 32px 28px; margin: 20px 28px 28px; display: none; }
+    .paywall.visible { display: block; }
+    .paywall h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .paywall > p { color: var(--muted); margin-bottom: 24px; font-size: 14px; line-height: 1.5; }
+    .price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
+    .price-tag { font-size: 36px; font-weight: 900; color: var(--accent); }
+    .price-desc { color: var(--muted); font-size: 14px; }
+    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 28px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; max-width: 340px; }
+    .btn-pay:hover { opacity: .88; }
+    .paywall-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 20px; color: var(--muted); font-size: 12px; }
+    .paywall-divider::before, .paywall-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    .code-row { display: flex; gap: 10px; }
+    .code-input { flex: 1; background: #0d1425; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .15s; font-family: inherit; }
+    .code-input:focus { border-color: var(--accent); }
+    .btn-unlock { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 11px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 700; transition: border-color .15s, color .15s; white-space: nowrap; }
+    .btn-unlock:hover { border-color: var(--accent); color: var(--accent); }
+    .code-hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+    /* Features */
+    .features { max-width: 900px; margin: 0 auto 80px; padding: 60px 20px 0; }
+    .features h2 { text-align: center; font-size: 28px; font-weight: 800; margin-bottom: 40px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 20px; }
+    .feature-icon { font-size: 28px; margin-bottom: 12px; }
+    .feature-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); padding: 32px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: gap; gap: 16px; }
+    .footer-copy { color: var(--muted); font-size: 13px; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { color: var(--muted); font-size: 13px; text-decoration: none; }
+    .footer-links a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">ResumeAI</a>
+  <div class="nav-links">
+    <a class="nav-link" href="/">Resume</a>
+    <a class="nav-link" href="/listing-generator.html">Listings</a>
+    <a class="nav-link" href="/seo-writer.html">SEO</a>
+    <a class="nav-link" href="/podcast-notes.html" style="color:var(--text);">Podcast</a>
+    <a class="nav-cta" href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">Get More Uses</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge">🎙️ AI Podcast Tool</div>
+  <h1>Show Notes in <span>30 Seconds</span></h1>
+  <p>Paste your transcript or describe your episode. Get polished show notes, timestamps, takeaways, and a guest bio — ready to publish.</p>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num">6</div><div class="stat-label">Sections generated</div></div>
+  <div class="stat"><div class="stat-num">$0</div><div class="stat-label">First generation free</div></div>
+  <div class="stat"><div class="stat-num">30s</div><div class="stat-label">Time to show notes</div></div>
+</div>
+
+<div class="app">
+  <div class="app-card">
+
+    <div class="app-header">
+      <div class="step-badge">1</div>
+      <h2>Episode Details</h2>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Episode Title</label>
+        <input type="text" id="ep-title" placeholder="e.g. How I Built a $1M Newsletter" maxlength="120">
+      </div>
+      <div class="form-group">
+        <label>Podcast Name</label>
+        <input type="text" id="podcast-name" placeholder="e.g. The Creator Economy Show" maxlength="100">
+      </div>
+      <div class="form-group full">
+        <label>Guest Name <span class="label-optional">(optional)</span></label>
+        <input type="text" id="guest-name" placeholder="e.g. Sarah Chen" maxlength="100">
+      </div>
+
+      <div class="divider-label">Content Source — choose one</div>
+
+      <div class="form-group full">
+        <label>Episode Transcript <span class="label-optional">(paste full or partial transcript)</span></label>
+        <textarea id="transcript" rows="9" placeholder="Paste the episode transcript here. The more you provide, the better the show notes. Even a rough auto-generated transcript works great." maxlength="15000" oninput="updateCharCount(this,'tc')"></textarea>
+        <div class="char-count"><span id="tc">0</span> / 15,000</div>
+      </div>
+
+      <div class="form-group full">
+        <label>Topic Summary <span class="label-optional">(if no transcript — describe what was covered)</span></label>
+        <textarea id="topics" rows="4" placeholder="e.g. We discussed how Sarah built her newsletter from 0 to 50k subscribers, monetization strategies, tools she uses, mistakes to avoid, and her advice for new creators." maxlength="3000" oninput="updateCharCount(this,'sc')"></textarea>
+        <div class="char-count"><span id="sc">0</span> / 3,000</div>
+        <div class="input-hint">Only needed if you don't have a transcript. A few sentences describing episode topics is enough.</div>
+      </div>
+    </div>
+
+    <div class="generate-bar">
+      <button class="btn-generate" id="generate-btn" onclick="generate()">
+        <span>🎙️</span> Generate Show Notes
+      </button>
+      <span class="free-note" id="free-note">First generation free — no account needed</span>
+    </div>
+
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <span id="loader-text">Generating your show notes…</span>
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <!-- Output -->
+    <div class="output-section" id="output-section">
+
+      <!-- Full Notes tab row -->
+      <div class="output-tabs">
+        <div class="output-tab active" onclick="switchTab('tab-full')">Full Notes</div>
+        <div class="output-tab" onclick="switchTab('tab-summary')">Summary</div>
+        <div class="output-tab" onclick="switchTab('tab-takeaways')">Takeaways</div>
+        <div class="output-tab" onclick="switchTab('tab-timestamps')">Timestamps</div>
+        <div class="output-tab" onclick="switchTab('tab-bio')">Guest Bio</div>
+        <div class="output-tab" onclick="switchTab('tab-resources')">Resources</div>
+        <div class="output-tab" onclick="switchTab('tab-cta')">CTA</div>
+      </div>
+
+      <!-- Full Notes -->
+      <div class="output-content active" id="tab-full">
+        <div class="output-box" id="full-notes-output"></div>
+        <div class="output-actions">
+          <button class="btn-copy" onclick="copyText('full-notes-output', this)">📋 Copy All</button>
+          <button class="btn-download" onclick="downloadNotes()">⬇ Download .txt</button>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="output-content" id="tab-summary">
+        <div class="output-box" id="summary-output"></div>
+        <div class="output-actions">
+          <button class="btn-copy" onclick="copyText('summary-output', this)">📋 Copy</button>
+        </div>
+      </div>
+
+      <!-- Takeaways -->
+      <div class="output-content" id="tab-takeaways">
+        <div class="takeaways-list" id="takeaways-list"></div>
+        <div class="output-actions" style="margin-top:16px;">
+          <button class="btn-copy" onclick="copySection('takeaways', this)">📋 Copy</button>
+        </div>
+      </div>
+
+      <!-- Timestamps -->
+      <div class="output-content" id="tab-timestamps">
+        <div class="timestamps-list" id="timestamps-list"></div>
+        <div class="output-actions" style="margin-top:16px;">
+          <button class="btn-copy" onclick="copySection('timestamps', this)">📋 Copy</button>
+        </div>
+      </div>
+
+      <!-- Guest Bio -->
+      <div class="output-content" id="tab-bio">
+        <div class="output-box" id="bio-output"></div>
+        <div class="output-actions">
+          <button class="btn-copy" onclick="copyText('bio-output', this)">📋 Copy</button>
+        </div>
+      </div>
+
+      <!-- Resources -->
+      <div class="output-content" id="tab-resources">
+        <div class="resources-list" id="resources-list"></div>
+        <div class="output-actions" style="margin-top:16px;">
+          <button class="btn-copy" onclick="copySection('resources', this)">📋 Copy</button>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="output-content" id="tab-cta">
+        <div class="output-box" id="cta-output"></div>
+        <div class="output-actions">
+          <button class="btn-copy" onclick="copyText('cta-output', this)">📋 Copy</button>
+        </div>
+      </div>
+
+    </div>
+    <!-- /output-section -->
+
+    <!-- Paywall -->
+    <div class="paywall" id="paywall">
+      <h3>You've used your free generation</h3>
+      <p>Get 10 more show note generations instantly. You'll receive an access code by download — paste it below to unlock.</p>
+      <div class="price-row">
+        <div class="price-tag">$4.99</div>
+        <div class="price-desc">for 10 generations</div>
+      </div>
+      <button class="btn-pay" onclick="startCheckout()">
+        <span>🔓</span> Get 10 Generations — $4.99
+      </button>
+      <div class="paywall-divider">Already purchased?</div>
+      <div class="code-row">
+        <input class="code-input" id="access-code" type="text" placeholder="Paste your access code here…" autocomplete="off">
+        <button class="btn-unlock" onclick="redeemCode()">Unlock</button>
+      </div>
+      <div class="code-hint">Your access code is in the download you received from Payhip after purchase.</div>
+    </div>
+
+  </div>
+</div>
+
+<section class="features">
+  <h2>Everything Your Show Notes Need</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">📝</div>
+      <h3>Episode Summary</h3>
+      <p>A compelling 2-3 paragraph summary that hooks readers and makes them hit play — or sends them straight to your subscriber list.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💡</div>
+      <h3>Key Takeaways</h3>
+      <p>5-7 punchy, specific bullet points your listeners can skim and immediately apply. Great for social posts too.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🕐</div>
+      <h3>Timestamps</h3>
+      <p>Chapter markers with topic labels so listeners can skip to what they care about — and keep coming back to your episodes.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">👤</div>
+      <h3>Guest Bio</h3>
+      <p>A professional third-person bio for your guest based on what was discussed — no back-and-forth needed.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔗</div>
+      <h3>Resources</h3>
+      <p>Books, tools, and links mentioned or implied in the episode, formatted and ready to drop into your website.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📣</div>
+      <h3>CTA Section</h3>
+      <p>A subscribe + review call-to-action tailored to your show name — the last thing every great episode needs.</p>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:64px 24px;margin-bottom:0;">
+  <div style="max-width:720px;margin:0 auto;">
+    <div style="font-size:11px;font-family:monospace;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">// Questions</div>
+    <div style="font-size:28px;font-weight:800;margin-bottom:32px;">Frequently Asked</div>
+    <div style="border-top:1px solid var(--border);">
+      <div style="border-bottom:1px solid var(--border);padding:20px 0;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:8px;">Do I need a full transcript?</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.7;">No. You can paste a partial or rough auto-generated transcript, or just fill in the "Topic Summary" field with a few sentences about what you covered. The AI works with whatever you give it.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:20px 0;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:8px;">Is the first generation really free?</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.7;">Yes — no account, no card required. Fill in your episode details, hit generate, and get your full show notes instantly.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:20px 0;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:8px;">How do I unlock more generations?</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.7;">Click "Get 10 Generations" on the paywall → purchase on Payhip → download the ZIP → copy your access code → paste it in the app → instantly unlocked.</div>
+      </div>
+      <div style="border-bottom:1px solid var(--border);padding:20px 0;">
+        <div style="font-size:15px;font-weight:700;margin-bottom:8px;">What formats does the output come in?</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.7;">You can copy individual sections (summary, takeaways, timestamps, bio, etc.) with one click, or download all show notes as a single .txt file to paste wherever you need them.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-copy">© 2025 ResumeAI. All rights reserved.</div>
+  <div class="footer-links">
+    <a href="/">Resume Tool</a>
+    <a href="/listing-generator.html">Listing Generator</a>
+    <a href="/seo-writer.html">SEO Writer</a>
+    <a href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">Get More Uses</a>
+  </div>
+</footer>
+
+<script>
+  // ─── State ─────────────────────────────────────────────
+  const STORAGE_KEY = 'podcast_uses';
+  const FREE_LIMIT = 1;
+  const PAYHIP_URL = 'https://payhip.com/b/gFaqD';
+  const PAID_CODE_KEY = 'podcast_code_uses';
+  const PAID_CODE_VALID = 'podcast_code_valid';
+
+  let lastResult = null;
+
+  function getUses() { return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10); }
+  function bumpUses() { localStorage.setItem(STORAGE_KEY, getUses() + 1); }
+  function hasUnlimited() { return localStorage.getItem(PAID_CODE_VALID) === '1'; }
+  function getPaidUses() { return parseInt(localStorage.getItem(PAID_CODE_KEY) || '0', 10); }
+  function bumpPaidUses() { const n = getPaidUses() - 1; localStorage.setItem(PAID_CODE_KEY, n); }
+  function canGenerate() {
+    if (hasUnlimited()) return true;
+    const pu = getPaidUses();
+    if (pu > 0) return true;
+    return getUses() < FREE_LIMIT;
+  }
+
+  function updateCharCount(el, spanId) {
+    document.getElementById(spanId).textContent = el.value.length;
+  }
+
+  // ─── Tab switching ────────────────────────────────────
+  function switchTab(id) {
+    document.querySelectorAll('.output-tab').forEach((t, i) => {
+      t.classList.toggle('active', t.getAttribute('onclick') === `switchTab('${id}')`);
+    });
+    document.querySelectorAll('.output-content').forEach(c => {
+      c.classList.toggle('active', c.id === id);
+    });
+  }
+
+  // ─── Copy helpers ─────────────────────────────────────
+  function copyText(elId, btn) {
+    const el = document.getElementById(elId);
+    navigator.clipboard.writeText(el.textContent || el.innerText).then(() => {
+      if (btn) { btn.textContent = '✓ Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 1800); }
+    });
+  }
+
+  function copySection(section, btn) {
+    let text = '';
+    if (section === 'takeaways' && lastResult) {
+      text = (lastResult.takeaways || []).map((t, i) => `${i + 1}. ${t}`).join('\n');
+    } else if (section === 'timestamps' && lastResult) {
+      text = (lastResult.timestamps || []).map(ts => `[${ts.time}] ${ts.label}`).join('\n');
+    } else if (section === 'resources' && lastResult) {
+      text = (lastResult.resources || []).map(r => `• ${r}`).join('\n');
+    }
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() => {
+      if (btn) { btn.textContent = '✓ Copied!'; btn.classList.add('copied'); setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 1800); }
+    });
+  }
+
+  function downloadNotes() {
+    if (!lastResult) return;
+    const text = lastResult.fullNotes || document.getElementById('full-notes-output').textContent;
+    const title = (document.getElementById('ep-title').value || 'podcast-show-notes').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+    const blob = new Blob([text], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${title || 'show-notes'}.txt`;
+    a.click();
+  }
+
+  // ─── Render results ───────────────────────────────────
+  function renderResults(data) {
+    lastResult = data;
+
+    // Full notes
+    document.getElementById('full-notes-output').textContent = data.fullNotes || '';
+
+    // Summary
+    document.getElementById('summary-output').textContent = data.summary || '';
+
+    // Takeaways
+    const tList = document.getElementById('takeaways-list');
+    tList.innerHTML = '';
+    (data.takeaways || []).forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'takeaway-row';
+      row.innerHTML = `<span class="takeaway-bullet">▸</span><span>${escHtml(t)}</span>`;
+      tList.appendChild(row);
+    });
+
+    // Timestamps
+    const tsList = document.getElementById('timestamps-list');
+    tsList.innerHTML = '';
+    (data.timestamps || []).forEach(ts => {
+      const row = document.createElement('div');
+      row.className = 'timestamp-row';
+      row.innerHTML = `<span class="ts-time">${escHtml(ts.time)}</span><span class="ts-label">${escHtml(ts.label)}</span>`;
+      tsList.appendChild(row);
+    });
+
+    // Bio
+    document.getElementById('bio-output').textContent = data.guestBio || '';
+
+    // Resources
+    const rList = document.getElementById('resources-list');
+    rList.innerHTML = '';
+    (data.resources || []).forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'resource-row';
+      row.textContent = r;
+      rList.appendChild(row);
+    });
+
+    // CTA
+    document.getElementById('cta-output').textContent = data.cta || '';
+
+    document.getElementById('output-section').classList.add('visible');
+    // Reset to first tab
+    switchTab('tab-full');
+  }
+
+  function escHtml(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ─── Generate ─────────────────────────────────────────
+  async function generate() {
+    const title = document.getElementById('ep-title').value.trim();
+    const podcastName = document.getElementById('podcast-name').value.trim();
+    const guest = document.getElementById('guest-name').value.trim();
+    const transcript = document.getElementById('transcript').value.trim();
+    const topics = document.getElementById('topics').value.trim();
+
+    if (!transcript && !topics) {
+      showError('Please paste a transcript or fill in the Topic Summary field.');
+      return;
+    }
+
+    if (!canGenerate()) {
+      document.getElementById('paywall').classList.add('visible');
+      document.getElementById('output-section').classList.remove('visible');
+      return;
+    }
+
+    setLoading(true);
+    hideError();
+
+    try {
+      const res = await fetch('/api/podcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, guest, podcastName, transcript, topics }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Server error ${res.status}`);
+      }
+
+      const data = await res.json();
+      renderResults(data);
+
+      // Track usage
+      if (hasUnlimited()) {
+        // unlimited — no decrement
+      } else if (getPaidUses() > 0) {
+        bumpPaidUses();
+      } else {
+        bumpUses();
+        updateFreeNote();
+      }
+
+    } catch (err) {
+      showError(err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function updateFreeNote() {
+    const uses = getUses();
+    const note = document.getElementById('free-note');
+    if (uses >= FREE_LIMIT) {
+      note.textContent = 'Free use spent — purchase to continue';
+      note.style.color = '#f59e0b';
+    }
+  }
+
+  function setLoading(on) {
+    document.getElementById('loader').classList.toggle('visible', on);
+    document.getElementById('generate-btn').disabled = on;
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error-box');
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+
+  function hideError() {
+    document.getElementById('error-box').classList.remove('visible');
+  }
+
+  // ─── Paywall ──────────────────────────────────────────
+  function startCheckout() {
+    window.open(PAYHIP_URL, '_blank', 'noopener');
+  }
+
+  async function redeemCode() {
+    const code = document.getElementById('access-code').value.trim();
+    if (!code) return;
+
+    try {
+      const res = await fetch('/api/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        localStorage.setItem(PAID_CODE_KEY, data.uses || 10);
+        localStorage.setItem(PAID_CODE_VALID, '0'); // counted, not unlimited
+        document.getElementById('paywall').classList.remove('visible');
+        document.getElementById('free-note').textContent = `${data.uses || 10} generations unlocked`;
+        document.getElementById('free-note').style.color = 'var(--green)';
+      } else {
+        alert('Invalid or already-used access code. Please check and try again.');
+      }
+    } catch {
+      alert('Could not verify code. Please check your connection and try again.');
+    }
+  }
+
+  // ─── Init ─────────────────────────────────────────────
+  updateFreeNote();
+</script>
+
+</body>
+</html>

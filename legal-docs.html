@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Legal Document Generator — Free NDA, Contracts & More</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --border: #1f2937;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+
+    /* Nav */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; align-items: center; gap: 20px; }
+    .nav-link { color: var(--muted); font-size: 14px; text-decoration: none; transition: color .2s; }
+    .nav-link:hover { color: var(--text); }
+    .nav-cta { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: background .2s; text-decoration: none; display: inline-block; }
+    .nav-cta:hover { background: #4f46e5; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 72px 20px 52px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 24px; }
+    .hero h1 { font-size: clamp(32px, 5.5vw, 58px); font-weight: 900; line-height: 1.1; margin-bottom: 18px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 520px; margin: 0 auto 12px; line-height: 1.6; }
+
+    /* Disclaimer banner */
+    .disclaimer-banner {
+      background: rgba(245,158,11,.08);
+      border: 1px solid rgba(245,158,11,.3);
+      border-radius: 10px;
+      padding: 12px 18px;
+      max-width: 700px;
+      margin: 16px auto 0;
+      font-size: 13px;
+      color: #fcd34d;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      text-align: left;
+    }
+    .disclaimer-banner .icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* Main layout */
+    .app { max-width: 960px; margin: 52px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 28px; }
+
+    /* Card */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .card-header { padding: 22px 28px 0; display: flex; align-items: center; gap: 12px; }
+    .step-badge { background: var(--accent); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .card-header h2 { font-size: 19px; font-weight: 700; }
+
+    /* Doc type selector */
+    .doc-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 20px 28px 24px; }
+    .doc-type-btn {
+      background: #0d1425;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 12px;
+      cursor: pointer;
+      text-align: center;
+      transition: border-color .2s, background .2s;
+      color: var(--text);
+    }
+    .doc-type-btn:hover { border-color: var(--accent); background: rgba(99,102,241,.05); }
+    .doc-type-btn.active { border-color: var(--accent); background: rgba(99,102,241,.1); }
+    .doc-type-btn .dt-icon { font-size: 26px; margin-bottom: 8px; }
+    .doc-type-btn .dt-label { font-size: 13px; font-weight: 600; line-height: 1.3; }
+
+    /* Form */
+    .form-body { padding: 4px 28px 28px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    textarea, input, select {
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .15s;
+      font-family: inherit;
+      resize: vertical;
+      width: 100%;
+    }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+
+    /* Dynamic fields */
+    .dynamic-fields { margin-top: 18px; display: flex; flex-direction: column; gap: 18px; }
+    .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+    /* Generate bar */
+    .generate-bar { padding: 0 28px 28px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .btn-generate {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white; border: none; padding: 13px 34px; border-radius: 10px;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+
+    /* Spinner */
+    .spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Output */
+    .output-section { display: none; }
+    .output-section.visible { display: block; }
+    .output-header { padding: 22px 28px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .output-title { font-size: 17px; font-weight: 700; }
+    .output-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .btn-action {
+      background: #0d1425; border: 1px solid var(--border); color: var(--text);
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: border-color .15s, background .15s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .btn-action:hover { border-color: var(--accent); background: rgba(99,102,241,.07); }
+    .btn-action.success { border-color: var(--green); color: var(--green); }
+
+    .doc-output {
+      margin: 20px 28px 28px;
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      color: #e2e8f0;
+    }
+
+    /* Error */
+    .error-box { margin: 16px 28px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; display: none; }
+    .error-box.visible { display: block; }
+
+    /* Paywall */
+    .paywall-overlay {
+      display: none;
+      position: fixed; inset: 0; background: rgba(10,15,30,.85); backdrop-filter: blur(6px);
+      z-index: 100; align-items: center; justify-content: center; padding: 20px;
+    }
+    .paywall-overlay.visible { display: flex; }
+    .paywall-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+      padding: 40px 36px; max-width: 500px; width: 100%; text-align: center;
+      position: relative;
+    }
+    .paywall-icon { font-size: 48px; margin-bottom: 16px; }
+    .paywall-card h2 { font-size: 26px; font-weight: 800; margin-bottom: 12px; }
+    .paywall-card p { color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 28px; }
+    .paywall-plans { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 28px; }
+    .plan-card {
+      background: #0d1425; border: 2px solid var(--border); border-radius: 12px;
+      padding: 20px 16px; cursor: pointer; transition: border-color .2s;
+      text-decoration: none; color: var(--text); display: block;
+    }
+    .plan-card:hover { border-color: var(--accent); }
+    .plan-card.featured { border-color: var(--accent); background: rgba(99,102,241,.08); }
+    .plan-badge { display: inline-block; background: var(--accent); color: white; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; }
+    .plan-price { font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+    .plan-price span { font-size: 14px; font-weight: 400; color: var(--muted); }
+    .plan-desc { font-size: 12px; color: var(--muted); }
+    .paywall-dismiss { background: transparent; border: none; color: var(--muted); font-size: 13px; cursor: pointer; margin-top: 4px; }
+    .paywall-dismiss:hover { color: var(--text); }
+
+    /* Footer */
+    footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; margin-top: 40px; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 680px) {
+      nav { padding: 14px 20px; }
+      .doc-types { grid-template-columns: repeat(2, 1fr); }
+      .form-grid, .fields-grid { grid-template-columns: 1fr; }
+      .paywall-plans { grid-template-columns: 1fr; }
+      .card-header, .output-header, .form-body, .generate-bar, .doc-output, .error-box { padding-left: 18px; padding-right: 18px; }
+      .doc-types { padding: 16px 18px 20px; }
+    }
+    @media (max-width: 400px) {
+      .doc-types { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a class="logo" href="/">⚡ LegalDocs</a>
+  <div class="nav-links">
+    <a class="nav-link" href="/">Resume Tool</a>
+    <a class="nav-cta" href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">Unlock Full Access</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="badge">✦ AI-Powered Legal Templates</div>
+  <h1>Generate <span>Legal Documents</span><br>in Seconds</h1>
+  <p>Professional NDAs, contracts, and agreements — drafted instantly. Save hours of back-and-forth with lawyers.</p>
+  <div class="disclaimer-banner">
+    <span class="icon">⚠️</span>
+    <span><strong>Template for reference only.</strong> These documents are starting points and do not constitute legal advice. Always consult a qualified attorney before signing or relying on any legal document.</span>
+  </div>
+</section>
+
+<!-- Main App -->
+<main class="app">
+
+  <!-- Step 1: Document Type -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">1</div>
+      <h2>Choose Document Type</h2>
+    </div>
+    <div class="doc-types">
+      <button class="doc-type-btn active" data-type="nda" onclick="selectDocType(this)">
+        <div class="dt-icon">🔒</div>
+        <div class="dt-label">Non-Disclosure Agreement (NDA)</div>
+      </button>
+      <button class="doc-type-btn" data-type="freelance" onclick="selectDocType(this)">
+        <div class="dt-icon">💼</div>
+        <div class="dt-label">Freelance Contract</div>
+      </button>
+      <button class="doc-type-btn" data-type="service" onclick="selectDocType(this)">
+        <div class="dt-icon">🤝</div>
+        <div class="dt-label">Service Agreement</div>
+      </button>
+      <button class="doc-type-btn" data-type="contractor" onclick="selectDocType(this)">
+        <div class="dt-icon">🏗️</div>
+        <div class="dt-label">Independent Contractor Agreement</div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Step 2: Fill in Details -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">2</div>
+      <h2>Fill In Details</h2>
+    </div>
+    <div class="form-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label id="partyALabel">Party A (Disclosing Party)</label>
+          <input id="partyA" type="text" placeholder="e.g. Acme Corp or John Smith" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label id="partyBLabel">Party B (Receiving Party)</label>
+          <input id="partyB" type="text" placeholder="e.g. Jane Doe or Beta LLC" autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>Governing Jurisdiction</label>
+          <select id="jurisdiction">
+            <option value="Delaware, USA">Delaware, USA</option>
+            <option value="California, USA">California, USA</option>
+            <option value="New York, USA">New York, USA</option>
+            <option value="Texas, USA">Texas, USA</option>
+            <option value="Florida, USA">Florida, USA</option>
+            <option value="Washington, USA">Washington, USA</option>
+            <option value="England and Wales, UK">England and Wales, UK</option>
+            <option value="Ontario, Canada">Ontario, Canada</option>
+            <option value="British Columbia, Canada">British Columbia, Canada</option>
+            <option value="New South Wales, Australia">New South Wales, Australia</option>
+            <option value="other">Other (specify below)</option>
+          </select>
+        </div>
+        <div class="form-group" id="customJurisdictionGroup" style="display:none;">
+          <label>Custom Jurisdiction</label>
+          <input id="customJurisdiction" type="text" placeholder="e.g. Singapore">
+        </div>
+      </div>
+
+      <!-- Dynamic type-specific fields -->
+      <div class="dynamic-fields" id="dynamicFields"></div>
+    </div>
+  </div>
+
+  <!-- Generate -->
+  <div class="card">
+    <div class="card-header">
+      <div class="step-badge">3</div>
+      <h2>Generate Your Document</h2>
+    </div>
+    <div class="generate-bar">
+      <button class="btn-generate" id="generateBtn" onclick="generate()">
+        <span class="spinner" id="spinner"></span>
+        <span id="generateBtnText">✦ Generate Document</span>
+      </button>
+      <span class="free-note" id="freeNote">1 free document — no sign-up needed</span>
+    </div>
+    <div class="error-box" id="errorBox"></div>
+  </div>
+
+  <!-- Output -->
+  <div class="card output-section" id="outputSection">
+    <div class="output-header">
+      <div class="output-title" id="outputTitle">Generated Document</div>
+      <div class="output-actions">
+        <button class="btn-action" id="copyBtn" onclick="copyDoc()">📋 Copy</button>
+        <button class="btn-action" onclick="downloadDoc()">⬇ Download .txt</button>
+      </div>
+    </div>
+    <div class="doc-output" id="docOutput"></div>
+  </div>
+
+</main>
+
+<!-- Paywall -->
+<div class="paywall-overlay" id="paywallOverlay">
+  <div class="paywall-card">
+    <div class="paywall-icon">🔐</div>
+    <h2>You've Used Your Free Document</h2>
+    <p>Unlock unlimited legal document generation for your business. One-time purchase or low monthly subscription.</p>
+    <div class="paywall-plans">
+      <a class="plan-card" href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">
+        <div class="plan-price">$9 <span>/doc</span></div>
+        <div class="plan-desc">Single document pack — buy once, use anytime</div>
+      </a>
+      <a class="plan-card featured" href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">
+        <div class="plan-badge">BEST VALUE</div>
+        <div class="plan-price">$49 <span>/mo</span></div>
+        <div class="plan-desc">Unlimited documents, all types, priority AI</div>
+      </a>
+    </div>
+    <button class="paywall-dismiss" onclick="dismissPaywall()">Maybe later</button>
+  </div>
+</div>
+
+<footer>
+  <p style="margin-bottom:8px;">
+    <a href="/">Resume Tool</a> &nbsp;·&nbsp;
+    <a href="/seo-writer.html">SEO Writer</a> &nbsp;·&nbsp;
+    <a href="/listing-generator.html">Listing Generator</a> &nbsp;·&nbsp;
+    <a href="/legal-docs.html">Legal Docs</a>
+  </p>
+  <p>© 2025 &nbsp;·&nbsp; These templates are for reference only and do not constitute legal advice.</p>
+</footer>
+
+<script>
+  // ── State ────────────────────────────────────────────────────────────────────
+  let currentDocType = "nda";
+  let generatedDoc = "";
+  let generatedTitle = "";
+  const FREE_KEY = "legalDocsUsed";
+
+  // ── Document type config ─────────────────────────────────────────────────────
+  const DOC_CONFIG = {
+    nda: {
+      partyALabel: "Disclosing Party (Full Name / Company)",
+      partyBLabel: "Receiving Party (Full Name / Company)",
+      fields: [
+        { id: "purpose",  label: "Purpose of Disclosure", type: "textarea", placeholder: "e.g. Exploring a potential business partnership or investment opportunity", rows: 2 },
+        { id: "duration", label: "Agreement Duration", type: "select", options: ["1 year","2 years","3 years","5 years","Indefinite"] },
+      ]
+    },
+    freelance: {
+      partyALabel: "Client (Full Name / Company)",
+      partyBLabel: "Freelancer (Full Name / Company)",
+      fields: [
+        { id: "scope",     label: "Scope of Work / Deliverables", type: "textarea", placeholder: "e.g. Design and develop a 5-page marketing website including mobile responsive layouts, contact form, and CMS integration.", rows: 3 },
+        { id: "rate",      label: "Payment Terms", type: "input", placeholder: "e.g. $5,000 total — 50% upfront, 50% on delivery" },
+        { id: "deadline",  label: "Project Deadline", type: "input", placeholder: "e.g. August 31, 2025 or within 6 weeks of signing" },
+        { id: "revisions", label: "Included Revision Rounds", type: "select", options: ["1","2","3","Unlimited"] },
+      ]
+    },
+    service: {
+      partyALabel: "Service Provider (Full Name / Company)",
+      partyBLabel: "Client (Full Name / Company)",
+      fields: [
+        { id: "scope",     label: "Description of Services", type: "textarea", placeholder: "e.g. Monthly social media management including content creation, scheduling, and analytics reporting.", rows: 3 },
+        { id: "rate",      label: "Fee Structure & Payment Schedule", type: "input", placeholder: "e.g. $2,000/month, invoiced on the 1st of each month" },
+        { id: "startDate", label: "Start Date", type: "input", placeholder: "e.g. July 1, 2025" },
+        { id: "endDate",   label: "End Date / Duration", type: "input", placeholder: "e.g. June 30, 2026 or Ongoing month-to-month" },
+      ]
+    },
+    contractor: {
+      partyALabel: "Company (Full Name)",
+      partyBLabel: "Contractor (Full Name / Business)",
+      fields: [
+        { id: "scope",     label: "Scope of Work / Project Description", type: "textarea", placeholder: "e.g. Develop and integrate a REST API for the company's e-commerce platform, including documentation and unit tests.", rows: 3 },
+        { id: "rate",      label: "Compensation Rate & Schedule", type: "input", placeholder: "e.g. $150/hour, invoiced bi-weekly" },
+        { id: "startDate", label: "Start Date", type: "input", placeholder: "e.g. July 1, 2025" },
+        { id: "endDate",   label: "End Date / Completion", type: "input", placeholder: "e.g. September 30, 2025 or Upon project completion" },
+      ]
+    },
+  };
+
+  // ── Render dynamic fields ────────────────────────────────────────────────────
+  function renderDynamicFields(type) {
+    const cfg = DOC_CONFIG[type];
+    document.getElementById("partyALabel").textContent = cfg.partyALabel;
+    document.getElementById("partyBLabel").textContent = cfg.partyBLabel;
+
+    const container = document.getElementById("dynamicFields");
+    if (!cfg.fields.length) { container.innerHTML = ""; return; }
+
+    const pairRows = [];
+    let i = 0;
+    while (i < cfg.fields.length) {
+      if (cfg.fields[i].type === "textarea") {
+        pairRows.push([cfg.fields[i]]);
+        i++;
+      } else {
+        const pair = [cfg.fields[i]];
+        if (i + 1 < cfg.fields.length && cfg.fields[i + 1].type !== "textarea") {
+          pair.push(cfg.fields[i + 1]);
+          i += 2;
+        } else {
+          i++;
+        }
+        pairRows.push(pair);
+      }
+    }
+
+    let html = "";
+    pairRows.forEach(row => {
+      const isFullWidth = row[0].type === "textarea" || row.length === 1;
+      html += `<div class="${isFullWidth ? "form-group full" : "fields-grid"}">`;
+      row.forEach(f => {
+        const groupClass = isFullWidth ? "" : "form-group";
+        html += `<div class="${groupClass}">`;
+        html += `<label>${f.label}</label>`;
+        if (f.type === "textarea") {
+          html += `<textarea id="${f.id}" rows="${f.rows || 2}" placeholder="${f.placeholder || ""}"></textarea>`;
+        } else if (f.type === "select") {
+          html += `<select id="${f.id}">`;
+          f.options.forEach(o => { html += `<option value="${o}">${o}</option>`; });
+          html += `</select>`;
+        } else {
+          html += `<input id="${f.id}" type="text" placeholder="${f.placeholder || ""}" autocomplete="off">`;
+        }
+        html += `</div>`;
+      });
+      html += `</div>`;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function selectDocType(btn) {
+    document.querySelectorAll(".doc-type-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentDocType = btn.dataset.type;
+    renderDynamicFields(currentDocType);
+    hideOutput();
+  }
+
+  // ── Jurisdiction toggle ──────────────────────────────────────────────────────
+  document.getElementById("jurisdiction").addEventListener("change", function () {
+    const grp = document.getElementById("customJurisdictionGroup");
+    grp.style.display = this.value === "other" ? "flex" : "none";
+  });
+
+  function getJurisdiction() {
+    const sel = document.getElementById("jurisdiction").value;
+    if (sel === "other") return document.getElementById("customJurisdiction").value.trim() || "Delaware, USA";
+    return sel;
+  }
+
+  // ── Collect terms ────────────────────────────────────────────────────────────
+  function collectTerms() {
+    const cfg = DOC_CONFIG[currentDocType];
+    const terms = {};
+    cfg.fields.forEach(f => {
+      const el = document.getElementById(f.id);
+      if (el) terms[f.id] = el.value.trim();
+    });
+    terms.governing = getJurisdiction();
+    return terms;
+  }
+
+  // ── Paywall ──────────────────────────────────────────────────────────────────
+  function hasUsedFree() {
+    return localStorage.getItem(FREE_KEY) === "1";
+  }
+  function markFreeUsed() {
+    localStorage.setItem(FREE_KEY, "1");
+  }
+  function showPaywall() {
+    document.getElementById("paywallOverlay").classList.add("visible");
+  }
+  function dismissPaywall() {
+    document.getElementById("paywallOverlay").classList.remove("visible");
+  }
+
+  // ── Generate ─────────────────────────────────────────────────────────────────
+  async function generate() {
+    if (hasUsedFree()) { showPaywall(); return; }
+
+    const partyA = document.getElementById("partyA").value.trim();
+    const partyB = document.getElementById("partyB").value.trim();
+    const jurisdiction = getJurisdiction();
+    const terms = collectTerms();
+
+    setLoading(true);
+    hideError();
+    hideOutput();
+
+    try {
+      const res = await fetch("/api/legal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ docType: currentDocType, partyA, partyB, jurisdiction, terms }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Generation failed.");
+
+      generatedDoc = data.document || "";
+      generatedTitle = data.title || "Legal Document";
+
+      document.getElementById("outputTitle").textContent = generatedTitle;
+      document.getElementById("docOutput").textContent = generatedDoc;
+      showOutput();
+
+      markFreeUsed();
+      document.getElementById("freeNote").textContent = "Upgrade for unlimited documents";
+    } catch (err) {
+      showError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── Copy / Download ──────────────────────────────────────────────────────────
+  async function copyDoc() {
+    if (!generatedDoc) return;
+    await navigator.clipboard.writeText(generatedDoc);
+    const btn = document.getElementById("copyBtn");
+    btn.textContent = "✓ Copied!";
+    btn.classList.add("success");
+    setTimeout(() => { btn.textContent = "📋 Copy"; btn.classList.remove("success"); }, 2000);
+  }
+
+  function downloadDoc() {
+    if (!generatedDoc) return;
+    const blob = new Blob([generatedDoc], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const safeName = generatedTitle.replace(/[^a-z0-9]/gi, "_").toLowerCase();
+    a.href = url;
+    a.download = `${safeName}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── UI helpers ───────────────────────────────────────────────────────────────
+  function setLoading(on) {
+    const btn = document.getElementById("generateBtn");
+    const spinner = document.getElementById("spinner");
+    const btnText = document.getElementById("generateBtnText");
+    btn.disabled = on;
+    spinner.style.display = on ? "block" : "none";
+    btnText.textContent = on ? "Generating…" : "✦ Generate Document";
+  }
+  function showOutput() { document.getElementById("outputSection").classList.add("visible"); }
+  function hideOutput() { document.getElementById("outputSection").classList.remove("visible"); }
+  function showError(msg) {
+    const box = document.getElementById("errorBox");
+    box.textContent = msg;
+    box.classList.add("visible");
+  }
+  function hideError() { document.getElementById("errorBox").classList.remove("visible"); }
+
+  // ── Init ─────────────────────────────────────────────────────────────────────
+  renderDynamicFields(currentDocType);
+  if (hasUsedFree()) {
+    document.getElementById("freeNote").textContent = "Upgrade for unlimited documents";
+  }
+</script>
+</body>
+</html>
