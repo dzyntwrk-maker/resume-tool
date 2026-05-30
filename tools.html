@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tools Suite — All Tools</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0f1e; --surface: #111827; --border: #1f2937; --accent: #6366f1; --accent2: #8b5cf6; --text: #f1f5f9; --muted: #64748b; --green: #10b981; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-cta { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-decoration: none; }
+    .hero { text-align: center; padding: 72px 20px 48px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(32px, 5vw, 56px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 18px; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+    .section { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+    .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+    .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 48px; }
+    .tool-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px; text-decoration: none; color: inherit; transition: border-color .2s, transform .15s; display: flex; flex-direction: column; gap: 10px; }
+    .tool-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .tool-icon { font-size: 32px; }
+    .tool-name { font-size: 17px; font-weight: 700; }
+    .tool-desc { color: var(--muted); font-size: 14px; line-height: 1.5; flex: 1; }
+    .tool-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+    .tool-price { font-size: 12px; color: var(--green); font-weight: 600; }
+    .tool-cta { font-size: 12px; color: var(--accent); font-weight: 700; }
+    .tier-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .tier-1 { background: rgba(16,185,129,.15); color: #6ee7b7; }
+    .tier-2 { background: rgba(234,179,8,.15); color: #fde68a; }
+    .tier-3 { background: rgba(249,115,22,.15); color: #fed7aa; }
+    .tier-4 { background: rgba(239,68,68,.15); color: #fca5a5; }
+    .download-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 16px; }
+    .download-section h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+    .download-section p { color: var(--muted); font-size: 14px; margin-bottom: 16px; line-height: 1.5; }
+    .file-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .file-chip { background: #0d1425; border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 12px; font-family: monospace; color: #a5b4fc; }
+    footer { text-align: center; padding: 48px 20px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 40px; }
+    @media (max-width: 640px) { nav { padding: 16px 20px; } .hero { padding: 48px 20px 32px; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">ResumeAI</a>
+    <a class="nav-cta" href="https://payhip.com/b/gFaqD" target="_blank">Get All Tools →</a>
+  </nav>
+
+  <div class="hero">
+    <div class="badge">🚀 30+ Monetization Strategies</div>
+    <h1>Your Complete<br><span>AI Tools Suite</span></h1>
+    <p>Web apps, automation scripts, bots, and extensions — all powered by Claude AI. First use free on every tool.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🟢 Tier 1 — Sellable Products (Scripts, Bots, Extensions)</div>
+    <div class="tools-grid">
+      <div class="download-section">
+        <h3>🐍 Python Automation Scripts</h3>
+        <p>4 ready-to-deliver Fiverr gig scripts. Bulk file renamer, folder sorter, web scraper, CSV cleaner. All CLI-based with --help flags.</p>
+        <div class="file-list">
+          <span class="file-chip">file-renamer.py</span>
+          <span class="file-chip">folder-sorter.py</span>
+          <span class="file-chip">web-scraper.py</span>
+          <span class="file-chip">csv-cleaner.py</span>
+        </div>
+      </div>
+      <div class="download-section">
+        <h3>🤖 Discord Bot</h3>
+        <p>Full-featured Discord.js bot with welcome messages, reaction roles, polls, moderation commands, and auto-responses. Deploys free on Railway.</p>
+        <div class="file-list">
+          <span class="file-chip">bot.js</span>
+          <span class="file-chip">config.json</span>
+          <span class="file-chip">README.md</span>
+        </div>
+      </div>
+      <div class="download-section">
+        <h3>🔌 Chrome Extension</h3>
+        <p>Smart Tab Manager — group tabs by domain, save sessions, detect duplicates, search all tabs. Manifest V3, ready for Chrome Web Store.</p>
+        <div class="file-list">
+          <span class="file-chip">manifest.json</span>
+          <span class="file-chip">popup.html</span>
+          <span class="file-chip">popup.js</span>
+          <span class="file-chip">background.js</span>
+        </div>
+      </div>
+      <div class="download-section">
+        <h3>📊 Google Apps Scripts</h3>
+        <p>4 business automation macros for Google Sheets — bulk email sender, multi-sheet aggregator, invoice generator, auto-dashboard with charts.</p>
+        <div class="file-list">
+          <span class="file-chip">email-automation.gs</span>
+          <span class="file-chip">data-aggregator.gs</span>
+          <span class="file-chip">invoice-generator.gs</span>
+          <span class="file-chip">sheet-dashboard.gs</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">🟡 Tier 2 — Web Tools ($300–$1,000/mo potential)</div>
+    <div class="tools-grid">
+      <a class="tool-card" href="/index.html">
+        <div class="tool-icon">📄</div>
+        <div class="tool-name">Resume & Cover Letter AI</div>
+        <div class="tool-desc">Tailors your resume to any job description and writes a matching cover letter. Claude-powered with ATS optimization.</div>
+        <div class="tool-meta"><span class="tool-price">Free → $9 for 10 uses</span><span class="tool-cta">Try Free →</span></div>
+      </a>
+      <a class="tool-card" href="/listing-generator.html">
+        <div class="tool-icon">🛍️</div>
+        <div class="tool-name">Etsy & eBay Listing Generator</div>
+        <div class="tool-desc">Generate SEO-optimized product titles, descriptions, bullet points, and tags for Etsy or eBay in seconds.</div>
+        <div class="tool-meta"><span class="tool-price">Free → $9 for 50 listings</span><span class="tool-cta">Try Free →</span></div>
+      </a>
+      <a class="tool-card" href="/seo-writer.html">
+        <div class="tool-icon">✍️</div>
+        <div class="tool-name">SEO Blog Article Writer</div>
+        <div class="tool-desc">Full keyword-optimized articles with title, meta description, H2/H3 outline, FAQ section, and CTA. Includes SEO score.</div>
+        <div class="tool-meta"><span class="tool-price">Free → $19 for 20 articles</span><span class="tool-cta">Try Free →</span></div>
+      </a>
+      <a class="tool-card" href="/email-sequences.html">
+        <div class="tool-icon">📧</div>
+        <div class="tool-name">Email Sequence Generator</div>
+        <div class="tool-desc">Create automated nurture sequences — welcome, sales, onboarding, re-engagement — with subject lines and full email bodies.</div>
+        <div class="tool-meta"><span class="tool-price">Free → $19 unlimited</span><span class="tool-cta">Try Free →</span></div>
+      </a>
+    </div>
+
+    <div class="section-title">🟠 Tier 3 — Growing Revenue ($1,000–$3,000/mo potential)</div>
+    <div class="tools-grid">
+      <a class="tool-card" href="/podcast-notes.html">
+        <div class="tool-icon">🎙️</div>
+        <div class="tool-name">Podcast Show Notes Generator</div>
+        <div class="tool-desc">Paste your transcript and get: episode summary, key takeaways, timestamps, guest bio, resources, and CTA. Perfect for podcasters.</div>
+        <div class="tool-meta"><span class="tool-price">Free → $49/month</span><span class="tool-cta">Try Free →</span></div>
+      </a>
+      <a class="tool-card" href="/product-descriptions.html">
+        <div class="tool-icon">🏷️</div>
+        <div class="tool-name">Bulk Product Description Writer</div>
+        <div class="tool-desc">Generate descriptions for hundreds of products at once. Optimized for Shopify, WooCommerce, and Amazon. Export as CSV.</div>
+        <div class="tool-meta"><span class="tool-price">$0.50–$2 per description</span><span class="tool-cta">Try Free →</span></div>
+      </a>
+    </div>
+
+    <div class="section-title">🔴 Tier 4 — High Value ($3,000–$8,000/mo potential)</div>
+    <div class="tools-grid">
+      <a class="tool-card" href="/legal-docs.html">
+        <div class="tool-icon">⚖️</div>
+        <div class="tool-name">Legal Document Generator</div>
+        <div class="tool-desc">Generate NDA, freelance contracts, service agreements, and IC agreements. Fill-in form → complete professional document.</div>
+        <div class="tool-meta"><span class="tool-price">Free → $9/doc or $49/mo</span><span class="tool-cta">Try Free →</span></div>
+      </a>
+      <a class="tool-card" href="/ad-copy.html">
+        <div class="tool-icon">📣</div>
+        <div class="tool-name">Ad Copy A/B Generator</div>
+        <div class="tool-desc">Generate 10 ad copy variations for Facebook, Google, Instagram, and LinkedIn — different angles, hooks, and CTAs to test.</div>
+        <div class="tool-meta"><span class="tool-price">Free → $29/month</span><span class="tool-cta">Try Free →</span></div>
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <p>All tools powered by <strong>Claude AI</strong> — First use free on every tool · <a href="https://payhip.com/b/gFaqD" style="color:var(--accent)" target="_blank">Get Full Access</a></p>
+  </footer>
+</body>
+</html>

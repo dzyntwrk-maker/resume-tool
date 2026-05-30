@@ -6,6 +6,9 @@
     { "source": "/podcast-notes", "destination": "/podcast-notes.html" },
     { "source": "/legal-docs", "destination": "/legal-docs.html" },
     { "source": "/email-sequences", "destination": "/email-sequences.html" },
+    { "source": "/product-descriptions", "destination": "/product-descriptions.html" },
+    { "source": "/ad-copy", "destination": "/ad-copy.html" },
+    { "source": "/tools", "destination": "/tools.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
