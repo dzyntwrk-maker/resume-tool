@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadScore AI — Lead Qualification & Scoring Tool</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --border: #1f2937;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --green: #10b981;
+      --yellow: #f59e0b;
+      --red: #ef4444;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+
+    /* Nav */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 14px; text-decoration: none; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { background: var(--accent); color: white !important; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-decoration: none; transition: background .2s; }
+    .nav-cta:hover { background: #4f46e5 !important; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 64px 20px 48px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 54px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 540px; margin: 0 auto 32px; line-height: 1.6; }
+
+    /* Stats */
+    .stats { display: flex; justify-content: center; gap: 60px; padding: 32px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 40px 60px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 800; color: var(--accent); }
+    .stat-label { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    /* App */
+    .app { max-width: 960px; margin: 0 auto 80px; padding: 0 20px; }
+
+    /* Tabs */
+    .tab-bar { display: flex; gap: 4px; margin-bottom: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 6px; width: fit-content; }
+    .tab-btn { background: none; border: none; color: var(--muted); font-size: 14px; font-weight: 600; padding: 8px 20px; border-radius: 8px; cursor: pointer; transition: all .15s; }
+    .tab-btn.active { background: var(--accent); color: white; }
+    .tab-btn:not(.active):hover { color: var(--text); background: rgba(99,102,241,.08); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* App Card */
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .app-header { padding: 24px 28px 4px; display: flex; align-items: center; gap: 12px; }
+    .step-badge { background: var(--accent); color: white; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .app-header h2 { font-size: 19px; font-weight: 700; }
+
+    /* Form */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 28px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    textarea, input, select {
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .15s;
+      font-family: inherit;
+      resize: vertical;
+    }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    select option { background: #0d1425; }
+
+    /* Generate button */
+    .form-footer { padding: 0 28px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .btn-generate {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white; border: none; padding: 13px 32px; border-radius: 10px;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-generate:hover { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .usage-note { color: var(--muted); font-size: 13px; }
+    .usage-note span { color: var(--accent); font-weight: 700; }
+
+    /* Spinner */
+    .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,.3); border-top-color: white; border-radius: 50%; animation: spin .7s linear infinite; display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Results */
+    .results { padding: 0 28px 28px; display: flex; flex-direction: column; gap: 20px; }
+    .result-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 4px; }
+    .result-title { font-size: 16px; font-weight: 700; }
+    .btn-export {
+      background: rgba(99,102,241,.12); color: var(--accent); border: 1px solid rgba(99,102,241,.3);
+      padding: 7px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-export:hover { background: rgba(99,102,241,.22); }
+
+    /* Lead Card */
+    .lead-card {
+      background: #0d1425; border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; transition: border-color .15s;
+    }
+    .lead-card:hover { border-color: rgba(99,102,241,.4); }
+    .lead-card-header { display: flex; align-items: center; gap: 16px; padding: 18px 22px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .lead-name { font-size: 17px; font-weight: 700; flex: 1; min-width: 140px; }
+    .tier-badge {
+      padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: .4px;
+    }
+    .tier-hot { background: rgba(239,68,68,.15); color: #f87171; border: 1px solid rgba(239,68,68,.3); }
+    .tier-warm { background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(245,158,11,.3); }
+    .tier-cold { background: rgba(100,116,139,.15); color: #94a3b8; border: 1px solid rgba(100,116,139,.3); }
+
+    /* Score Gauge */
+    .gauge-wrap { display: flex; align-items: center; gap: 14px; }
+    .gauge { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+    .gauge svg { transform: rotate(-90deg); }
+    .gauge-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+    .gauge-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
+    .gauge-text { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800; }
+
+    .score-hot { stroke: #ef4444; color: #f87171; }
+    .score-warm { stroke: #f59e0b; color: #fbbf24; }
+    .score-cold { stroke: #64748b; color: #94a3b8; }
+
+    .gauge-labels { display: flex; flex-direction: column; gap: 4px; }
+    .gauge-label-row { display: flex; align-items: center; gap: 8px; }
+    .gauge-label { font-size: 12px; color: var(--muted); }
+    .gauge-value { font-size: 14px; font-weight: 700; }
+
+    /* Lead Card Body */
+    .lead-card-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 16px; }
+    .lead-section-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+    .next-action-box {
+      background: rgba(99,102,241,.07); border: 1px solid rgba(99,102,241,.2);
+      border-radius: 10px; padding: 12px 16px; font-size: 14px; line-height: 1.5;
+    }
+    .outreach-box {
+      background: rgba(255,255,255,.03); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px; font-size: 13px; line-height: 1.65;
+      white-space: pre-wrap; color: #cbd5e1; position: relative;
+    }
+    .btn-copy {
+      position: absolute; top: 10px; right: 10px;
+      background: rgba(99,102,241,.12); color: var(--accent); border: 1px solid rgba(99,102,241,.25);
+      padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-copy:hover { background: rgba(99,102,241,.25); }
+
+    /* Bulk mode */
+    .bulk-hint { color: var(--muted); font-size: 13px; padding: 0 28px 8px; line-height: 1.5; }
+
+    /* Paywall */
+    .paywall-banner {
+      background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(139,92,246,.12));
+      border: 1px solid rgba(99,102,241,.3); border-radius: 14px;
+      padding: 28px 32px; text-align: center; margin: 20px 0;
+    }
+    .paywall-banner h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; }
+    .paywall-banner p { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
+    .btn-upgrade {
+      display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white; text-decoration: none; padding: 13px 32px; border-radius: 10px;
+      font-size: 15px; font-weight: 700; transition: opacity .2s;
+    }
+    .btn-upgrade:hover { opacity: .88; }
+    .paywall-note { color: var(--muted); font-size: 12px; margin-top: 12px; }
+
+    /* Error */
+    .error-box { background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.25); border-radius: 10px; padding: 14px 18px; color: #f87171; font-size: 14px; }
+
+    /* Footer */
+    footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 640px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .stats { gap: 32px; margin: 0 16px 40px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+      .app { padding: 0 12px; }
+      .form-grid, .form-footer, .results { padding-left: 16px; padding-right: 16px; }
+      .app-header { padding: 20px 16px 4px; }
+      .lead-card-header { padding: 14px 16px; }
+      .lead-card-body { padding: 14px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">LeadScore AI</a>
+  <div class="nav-links">
+    <a href="/tools">All Tools</a>
+    <a href="/email-sequences">Email Sequences</a>
+    <a href="https://payhip.com/b/gFaqD" target="_blank" class="nav-cta">Upgrade $99/mo</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge">AI-Powered Sales Intelligence</div>
+  <h1>Qualify &amp; Score Leads<br><span>in Seconds</span></h1>
+  <p>Stop wasting time on bad-fit prospects. Get AI-powered lead scores, ICP match percentages, and personalized outreach templates instantly.</p>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num">87%</div><div class="stat-label">Accuracy vs manual scoring</div></div>
+  <div class="stat"><div class="stat-num">5x</div><div class="stat-label">Faster lead qualification</div></div>
+  <div class="stat"><div class="stat-num">2.3x</div><div class="stat-label">Higher response rates</div></div>
+</div>
+
+<div class="app">
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('single', this)">Single Lead</button>
+    <button class="tab-btn" onclick="switchTab('bulk', this)">Bulk Mode</button>
+  </div>
+
+  <!-- Single Lead Tab -->
+  <div id="tab-single" class="tab-panel active">
+    <div class="app-card">
+      <div class="app-header">
+        <div class="step-badge">1</div>
+        <h2>Enter Lead Details</h2>
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Company Name *</label>
+          <input type="text" id="companyName" placeholder="Acme Corp" />
+        </div>
+        <div class="form-group">
+          <label>Website URL</label>
+          <input type="text" id="website" placeholder="https://acme.com" />
+        </div>
+        <div class="form-group">
+          <label>Industry *</label>
+          <select id="industry">
+            <option value="">Select industry…</option>
+            <option value="SaaS / Software">SaaS / Software</option>
+            <option value="E-commerce / Retail">E-commerce / Retail</option>
+            <option value="Financial Services">Financial Services</option>
+            <option value="Healthcare / MedTech">Healthcare / MedTech</option>
+            <option value="Manufacturing">Manufacturing</option>
+            <option value="Professional Services">Professional Services</option>
+            <option value="Real Estate">Real Estate</option>
+            <option value="Marketing / Advertising">Marketing / Advertising</option>
+            <option value="Logistics / Supply Chain">Logistics / Supply Chain</option>
+            <option value="Education / EdTech">Education / EdTech</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Company Size</label>
+          <select id="size">
+            <option value="">Select size…</option>
+            <option value="1-10">1–10 employees</option>
+            <option value="11-50">11–50 employees</option>
+            <option value="51-200">51–200 employees</option>
+            <option value="201-500">201–500 employees</option>
+            <option value="501-1000">501–1,000 employees</option>
+            <option value="1000+">1,000+ employees</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Budget Range</label>
+          <select id="budget">
+            <option value="">Select budget…</option>
+            <option value="under-10k">Under $10K/yr</option>
+            <option value="10k-50k">$10K–$50K/yr</option>
+            <option value="50k-100k">$50K–$100K/yr</option>
+            <option value="100k-250k">$100K–$250K/yr</option>
+            <option value="250k-500k">$250K–$500K/yr</option>
+            <option value="500k+">$500K+/yr</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Buying Timeline</label>
+          <select id="timeline">
+            <option value="">Select timeline…</option>
+            <option value="immediate">Immediate (ASAP)</option>
+            <option value="1-3-months">1–3 months</option>
+            <option value="3-6-months">3–6 months</option>
+            <option value="6-12-months">6–12 months</option>
+            <option value="12-months+">12+ months</option>
+            <option value="no-timeline">No clear timeline</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Decision Maker Role</label>
+          <select id="role">
+            <option value="">Select role…</option>
+            <option value="c-suite">C-Suite (CEO, CTO, CMO…)</option>
+            <option value="vp-director">VP / Director</option>
+            <option value="manager">Manager</option>
+            <option value="individual-contributor">Individual Contributor</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Pain Points / Notes</label>
+          <textarea id="painPoints" rows="3" placeholder="Describe the lead's challenges, goals, or anything they mentioned…"></textarea>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn-generate" id="btn-single" onclick="scoreSingleLead()">
+          <span class="spinner" id="spinner-single"></span>
+          Score This Lead
+        </button>
+        <span class="usage-note" id="usage-note">
+          <span id="free-left">5</span> free scores remaining
+        </span>
+      </div>
+      <div class="results" id="results-single"></div>
+    </div>
+  </div>
+
+  <!-- Bulk Mode Tab -->
+  <div id="tab-bulk" class="tab-panel">
+    <div class="app-card">
+      <div class="app-header">
+        <div class="step-badge">B</div>
+        <h2>Bulk Lead Scoring</h2>
+      </div>
+      <p class="bulk-hint">
+        Paste one company description per line. Include as much detail as possible for better scoring.<br>
+        <strong>Format:</strong> Company Name | Industry | Size | Budget | Timeline | Role | Pain Points<br>
+        <strong>Example:</strong> Acme Corp | SaaS / Software | 51-200 | 50k-100k | 1-3-months | vp-director | Struggling with lead tracking
+      </p>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Company List (one per line)</label>
+          <textarea id="bulkInput" rows="10" placeholder="Acme Corp | SaaS / Software | 51-200 | 100k-250k | 1-3-months | c-suite | Can't scale outbound
+Globex Inc | Manufacturing | 201-500 | 50k-100k | 3-6-months | manager | Need better CRM
+Initech | Financial Services | 11-50 | under-10k | no-timeline | individual-contributor | Exploring options"></textarea>
+        </div>
+      </div>
+      <div class="form-footer">
+        <button class="btn-generate" id="btn-bulk" onclick="scoreBulkLeads()">
+          <span class="spinner" id="spinner-bulk"></span>
+          Score All Leads
+        </button>
+        <span class="usage-note" id="usage-note-bulk">
+          <span id="free-left-bulk">5</span> free scores remaining
+        </span>
+      </div>
+      <div class="results" id="results-bulk"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2025 LeadScore AI &mdash; <a href="/tools">All Tools</a> &mdash; <a href="https://payhip.com/b/gFaqD" target="_blank">Upgrade for Unlimited Access</a></p>
+</footer>
+
+<script>
+  const PAYHIP_URL = 'https://payhip.com/b/gFaqD';
+  const FREE_LIMIT = 5;
+  let usedCount = parseInt(localStorage.getItem('lq_used') || '0');
+
+  function updateUsageDisplay() {
+    const left = Math.max(0, FREE_LIMIT - usedCount);
+    document.getElementById('free-left').textContent = left;
+    document.getElementById('free-left-bulk').textContent = left;
+  }
+  updateUsageDisplay();
+
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+  }
+
+  function checkPaywall(count = 1) {
+    if (usedCount + count > FREE_LIMIT) return false;
+    return true;
+  }
+
+  function incrementUsage(count = 1) {
+    usedCount = Math.min(FREE_LIMIT, usedCount + count);
+    localStorage.setItem('lq_used', usedCount);
+    updateUsageDisplay();
+  }
+
+  function paywallHTML() {
+    return `<div class="paywall-banner">
+      <h3>You've used your 5 free lead scores</h3>
+      <p>Upgrade to LeadScore AI Pro for unlimited lead scoring, bulk mode, CSV export, and personalized outreach templates for your entire pipeline.</p>
+      <a href="${PAYHIP_URL}" target="_blank" class="btn-upgrade">Upgrade — $99/month</a>
+      <p class="paywall-note">Unlimited leads · Bulk scoring · CSV export · Priority AI scoring</p>
+    </div>`;
+  }
+
+  function tierClass(tier) {
+    return tier === 'Hot' ? 'tier-hot' : tier === 'Warm' ? 'tier-warm' : 'tier-cold';
+  }
+
+  function scoreClass(score) {
+    return score >= 70 ? 'score-hot' : score >= 40 ? 'score-warm' : 'score-cold';
+  }
+
+  function gaugeHTML(score, tier) {
+    const r = 26;
+    const circ = 2 * Math.PI * r;
+    const offset = circ - (score / 100) * circ;
+    const cls = scoreClass(score);
+    return `<div class="gauge">
+      <svg width="64" height="64" viewBox="0 0 64 64">
+        <circle class="gauge-bg" cx="32" cy="32" r="${r}"/>
+        <circle class="gauge-fill ${cls}" cx="32" cy="32" r="${r}"
+          stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+      </svg>
+      <div class="gauge-text ${cls}">${score}</div>
+    </div>`;
+  }
+
+  function leadCardHTML(lead, idx) {
+    const { name, score, tier, icpMatch, outreachTemplate, nextAction } = lead;
+    const tClass = tierClass(tier);
+    const sClass = scoreClass(score);
+    const escapedTemplate = (outreachTemplate || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<div class="lead-card" id="lead-card-${idx}">
+      <div class="lead-card-header">
+        <div class="lead-name">${name}</div>
+        <span class="tier-badge ${tClass}">${tier} Lead</span>
+        <div class="gauge-wrap">
+          ${gaugeHTML(score, tier)}
+          <div class="gauge-labels">
+            <div class="gauge-label-row">
+              <span class="gauge-label">Lead Score</span>
+              <span class="gauge-value ${sClass}">${score}/100</span>
+            </div>
+            <div class="gauge-label-row">
+              <span class="gauge-label">ICP Match</span>
+              <span class="gauge-value">${icpMatch}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="lead-card-body">
+        <div>
+          <div class="lead-section-title">Recommended Next Action</div>
+          <div class="next-action-box">${nextAction || '—'}</div>
+        </div>
+        <div>
+          <div class="lead-section-title">Outreach Template</div>
+          <div class="outreach-box" id="template-${idx}">${escapedTemplate}
+<button class="btn-copy" onclick="copyTemplate(${idx})">Copy</button></div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function copyTemplate(idx) {
+    const el = document.getElementById('template-' + idx);
+    const text = el.innerText.replace(/\nCopy$/, '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.querySelector('.btn-copy');
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+    });
+  }
+
+  function exportCSV(leads) {
+    const headers = ['Company', 'Score', 'Tier', 'ICP Match %', 'Next Action', 'Outreach Template'];
+    const rows = leads.map(l => [
+      l.name, l.score, l.tier, l.icpMatch,
+      (l.nextAction || '').replace(/"/g, '""'),
+      (l.outreachTemplate || '').replace(/\n/g, ' ').replace(/"/g, '""'),
+    ].map(v => `"${v}"`).join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'scored-leads.csv'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function renderResults(leads, container) {
+    const hasMultiple = leads.length > 1;
+    let html = `<div class="result-header">
+      <div class="result-title">${leads.length} Lead${leads.length > 1 ? 's' : ''} Scored</div>
+      ${hasMultiple ? `<button class="btn-export" onclick="exportCSVFromContainer('${container}')">Download CSV</button>` : ''}
+    </div>`;
+    leads.forEach((lead, i) => { html += leadCardHTML(lead, container + '-' + i); });
+    const el = document.getElementById(container);
+    el.innerHTML = html;
+    el.dataset.leads = JSON.stringify(leads);
+  }
+
+  function exportCSVFromContainer(container) {
+    const el = document.getElementById(container);
+    const leads = JSON.parse(el.dataset.leads || '[]');
+    exportCSV(leads);
+  }
+
+  function setLoading(btn, spinner, loading) {
+    document.getElementById(btn).disabled = loading;
+    document.getElementById(spinner).style.display = loading ? 'block' : 'none';
+  }
+
+  async function callAPI(payload) {
+    const resp = await fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: 'Request failed' }));
+      throw new Error(err.error || 'API error');
+    }
+    return resp.json();
+  }
+
+  async function scoreSingleLead() {
+    const companyName = document.getElementById('companyName').value.trim();
+    const industry = document.getElementById('industry').value;
+    if (!companyName) {
+      document.getElementById('results-single').innerHTML = '<div class="error-box">Please enter a company name.</div>';
+      return;
+    }
+    if (!checkPaywall(1)) {
+      document.getElementById('results-single').innerHTML = paywallHTML();
+      return;
+    }
+
+    setLoading('btn-single', 'spinner-single', true);
+    document.getElementById('results-single').innerHTML = '';
+
+    try {
+      const payload = {
+        companyName,
+        website: document.getElementById('website').value.trim(),
+        industry,
+        size: document.getElementById('size').value,
+        budget: document.getElementById('budget').value,
+        painPoints: document.getElementById('painPoints').value.trim(),
+        timeline: document.getElementById('timeline').value,
+        role: document.getElementById('role').value,
+      };
+      const data = await callAPI(payload);
+      incrementUsage(1);
+      const leads = data.leads || [];
+      if (leads.length === 0) throw new Error('No results returned');
+      renderResults(leads, 'results-single');
+    } catch (e) {
+      document.getElementById('results-single').innerHTML = `<div class="error-box">Error: ${e.message}</div>`;
+    } finally {
+      setLoading('btn-single', 'spinner-single', false);
+    }
+  }
+
+  function parseBulkLine(line) {
+    const parts = line.split('|').map(s => s.trim());
+    return {
+      companyName: parts[0] || '',
+      industry: parts[1] || '',
+      size: parts[2] || '',
+      budget: parts[3] || '',
+      timeline: parts[4] || '',
+      role: parts[5] || '',
+      painPoints: parts[6] || '',
+    };
+  }
+
+  async function scoreBulkLeads() {
+    const raw = document.getElementById('bulkInput').value.trim();
+    if (!raw) {
+      document.getElementById('results-bulk').innerHTML = '<div class="error-box">Please enter at least one company.</div>';
+      return;
+    }
+    const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) {
+      document.getElementById('results-bulk').innerHTML = '<div class="error-box">No valid lines found.</div>';
+      return;
+    }
+
+    const count = lines.length;
+    if (!checkPaywall(count)) {
+      document.getElementById('results-bulk').innerHTML = paywallHTML();
+      return;
+    }
+
+    setLoading('btn-bulk', 'spinner-bulk', true);
+    document.getElementById('results-bulk').innerHTML = '';
+
+    try {
+      const leads = lines.map(parseBulkLine);
+      const data = await callAPI({ leads });
+      incrementUsage(count);
+      const scored = data.leads || [];
+      if (scored.length === 0) throw new Error('No results returned');
+      renderResults(scored, 'results-bulk');
+    } catch (e) {
+      document.getElementById('results-bulk').innerHTML = `<div class="error-box">Error: ${e.message}</div>`;
+    } finally {
+      setLoading('btn-bulk', 'spinner-bulk', false);
+    }
+  }
+</script>
+</body>
+</html>

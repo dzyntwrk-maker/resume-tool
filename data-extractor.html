@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DocExtract AI — Structured Data from Any Document</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0f1e; --surface: #111827; --border: #1f2937; --accent: #6366f1; --text: #f1f5f9; --muted: #64748b; --green: #10b981; --yellow: #f59e0b; --red: #ef4444; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 16px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 13px; text-decoration: none; font-weight: 600; }
+    .nav-links a:hover { color: var(--text); }
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+    .app { max-width: 960px; margin: 40px auto; padding: 0 20px; }
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 24px 28px; }
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      nav { padding: 16px 20px; }
+      .nav-links { gap: 10px; }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    textarea, input, select { background: #0d1425; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .15s; font-family: inherit; resize: vertical; width: 100%; }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+    .preset-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .chip { background: rgba(99,102,241,.12); border: 1px solid rgba(99,102,241,.25); color: #a5b4fc; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .chip:hover { background: rgba(99,102,241,.25); }
+    .generate-bar { padding: 0 28px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .btn-generate { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+    .loader { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; padding: 20px 0; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-box { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; margin: 0 28px 16px; display: none; }
+    .error-box.visible { display: block; }
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); border: 1px solid rgba(99,102,241,.25); border-radius: 16px; padding: 28px; margin: 0 28px 28px; display: none; text-align: center; }
+    .paywall.visible { display: block; }
+    .paywall h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .paywall p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    .price-row { font-size: 36px; font-weight: 900; color: var(--accent); margin-bottom: 16px; }
+    .price-row span { font-size: 16px; color: var(--muted); font-weight: 400; }
+    .paywall-features { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 24px; }
+    .paywall-feature { background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.2); border-radius: 8px; padding: 6px 14px; font-size: 13px; color: #a5b4fc; }
+    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 40px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-block; }
+    .btn-pay:hover { opacity: .88; }
+    .output-section { padding: 0 28px 28px; display: none; }
+    .output-section.visible { display: block; }
+    .output-toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 20px; flex-wrap: wrap; }
+    .btn-action { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s; }
+    .btn-action:hover { border-color: var(--accent); }
+    .btn-action.primary { background: var(--accent); border-color: var(--accent); color: white; }
+    .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--accent); margin-bottom: 14px; }
+    .extract-table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; }
+    .extract-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .extract-table th { text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); background: #0d1425; }
+    .extract-table td { padding: 12px 16px; border-bottom: 1px solid rgba(31,41,55,.6); vertical-align: top; }
+    .extract-table tr:last-child td { border-bottom: none; }
+    .extract-table tr:hover td { background: rgba(99,102,241,.04); }
+    .field-name { font-weight: 600; color: #e2e8f0; }
+    .field-value { color: #cbd5e1; word-break: break-word; }
+    .field-value.not-found { color: var(--muted); font-style: italic; }
+    .confidence { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+    .confidence.high { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.25); }
+    .confidence.medium { background: rgba(245,158,11,.15); color: #fde68a; border: 1px solid rgba(245,158,11,.25); }
+    .confidence.low { background: rgba(239,68,68,.15); color: #fca5a5; border: 1px solid rgba(239,68,68,.25); }
+    .snippet-text { font-size: 12px; color: var(--muted); font-family: monospace; background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; margin-top: 4px; max-width: 340px; word-break: break-all; white-space: pre-wrap; }
+    .raw-card { background: #0d1425; border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 14px; }
+    .raw-text { font-size: 13px; line-height: 1.6; color: var(--muted); font-family: monospace; white-space: pre-wrap; max-height: 160px; overflow-y: auto; }
+    .summary-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+    .summary-stat { background: rgba(99,102,241,.08); border: 1px solid rgba(99,102,241,.2); border-radius: 10px; padding: 12px 18px; flex: 1; min-width: 120px; text-align: center; }
+    .summary-stat .stat-val { font-size: 26px; font-weight: 900; color: var(--accent); }
+    .summary-stat .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 60px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">AI Tools</a>
+    <div class="nav-links">
+      <a href="/tools.html">All Tools</a>
+      <a href="/meeting-summarizer.html">Meeting Summarizer</a>
+      <a href="/legal-docs.html">Legal Docs</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="badge">Document Intelligence</div>
+    <h1>Extract Structured Data<br><span>From Any Document</span></h1>
+    <p>Paste text from invoices, contracts, receipts, or reports — get a clean table of extracted fields with confidence scores in seconds.</p>
+  </div>
+
+  <div class="app">
+    <div class="app-card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Document Type</label>
+          <select id="doc-type">
+            <option value="invoice">Invoice</option>
+            <option value="contract">Contract / Agreement</option>
+            <option value="receipt">Receipt</option>
+            <option value="report">Report</option>
+            <option value="general">General Document</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fields to Extract</label>
+          <input type="text" id="fields-input" placeholder="e.g. vendor name, total amount, date, invoice number" />
+        </div>
+        <div class="form-group full">
+          <label>Quick Presets</label>
+          <div class="preset-chips">
+            <span class="chip" data-preset="invoice">Invoice: vendor, invoice number, date, due date, subtotal, tax, total</span>
+            <span class="chip" data-preset="contract">Contract: party 1, party 2, effective date, expiration date, payment terms, jurisdiction</span>
+            <span class="chip" data-preset="receipt">Receipt: merchant name, date, items, subtotal, tax, total, payment method</span>
+            <span class="chip" data-preset="report">Report: title, author, date, key findings, recommendations, summary</span>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label>Paste Document Text</label>
+          <textarea id="doc-text" rows="10" placeholder="Copy and paste the text content from your PDF, invoice, contract, or other document here..."></textarea>
+        </div>
+      </div>
+
+      <div class="generate-bar">
+        <button class="btn-generate" id="extract-btn" onclick="runExtract()">Extract Data</button>
+        <span class="free-note" id="free-note">3 free extractions remaining</span>
+        <div class="loader" id="loader"><div class="spinner"></div> Extracting fields…</div>
+      </div>
+
+      <div class="error-box" id="error-box"></div>
+
+      <div class="paywall" id="paywall">
+        <h3>You've used your 3 free extractions</h3>
+        <p>Unlock unlimited extractions — built for accountants, law firms, and finance teams.</p>
+        <div class="price-row">$49<span>/month</span></div>
+        <div class="paywall-features">
+          <span class="paywall-feature">Unlimited extractions</span>
+          <span class="paywall-feature">All document types</span>
+          <span class="paywall-feature">Custom field sets</span>
+          <span class="paywall-feature">Bulk CSV export</span>
+          <span class="paywall-feature">API access</span>
+        </div>
+        <a class="btn-pay" href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">Unlock Full Access</a>
+      </div>
+
+      <div class="output-section" id="output-section">
+        <div class="summary-row" id="summary-row"></div>
+        <div class="output-toolbar">
+          <button class="btn-action" onclick="copyJSON()">Copy as JSON</button>
+          <button class="btn-action" onclick="copyCSV()">Copy as CSV</button>
+          <button class="btn-action primary" onclick="downloadCSV()">Download .csv</button>
+        </div>
+        <div class="section-label">Extracted Fields</div>
+        <div class="extract-table-wrap">
+          <table class="extract-table" id="extract-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Extracted Value</th>
+                <th>Confidence</th>
+                <th>Source Snippet</th>
+              </tr>
+            </thead>
+            <tbody id="extract-tbody"></tbody>
+          </table>
+        </div>
+        <div class="section-label" style="margin-top:8px;">Raw Text Excerpt</div>
+        <div class="raw-card">
+          <div class="raw-text" id="raw-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>DocExtract AI &mdash; Structured data from any document &bull; <a href="https://payhip.com/b/gFaqD" style="color:var(--accent)">Upgrade for unlimited access</a></p>
+  </footer>
+
+  <script>
+    const STORAGE_KEY = 'docextract_uses';
+    const MAX_FREE = 3;
+    let lastResult = null;
+
+    function getUses() { return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10); }
+    function incUses() { localStorage.setItem(STORAGE_KEY, getUses() + 1); }
+    function updateFreeNote() {
+      const rem = Math.max(0, MAX_FREE - getUses());
+      const el = document.getElementById('free-note');
+      if (rem === 0) el.innerHTML = '<span style="color:var(--red)">No free extractions left</span>';
+      else el.textContent = rem + ' free extraction' + (rem === 1 ? '' : 's') + ' remaining';
+    }
+    updateFreeNote();
+
+    // Preset chips
+    const PRESETS = {
+      invoice: 'vendor name, invoice number, date, due date, bill to, subtotal, tax, total amount',
+      contract: 'party 1, party 2, effective date, expiration date, payment terms, governing law, jurisdiction',
+      receipt: 'merchant name, date, items purchased, subtotal, tax, total, payment method, receipt number',
+      report: 'title, author, date, executive summary, key findings, recommendations, next steps',
+    };
+    document.querySelectorAll('.chip[data-preset]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const p = chip.dataset.preset;
+        document.getElementById('fields-input').value = PRESETS[p] || '';
+        const docType = document.getElementById('doc-type');
+        if (p !== 'report') docType.value = p;
+        else docType.value = 'report';
+      });
+    });
+
+    async function runExtract() {
+      const text = document.getElementById('doc-text').value.trim();
+      const docType = document.getElementById('doc-type').value;
+      const fieldsRaw = document.getElementById('fields-input').value.trim();
+
+      document.getElementById('error-box').classList.remove('visible');
+      document.getElementById('paywall').classList.remove('visible');
+      document.getElementById('output-section').classList.remove('visible');
+
+      if (!text) { showError('Please paste your document text.'); return; }
+      if (!fieldsRaw) { showError('Please enter at least one field to extract (or use a preset).'); return; }
+
+      if (getUses() >= MAX_FREE) { document.getElementById('paywall').classList.add('visible'); return; }
+
+      const fields = fieldsRaw.split(',').map(f => f.trim()).filter(Boolean);
+      if (fields.length === 0) { showError('Please enter valid field names separated by commas.'); return; }
+
+      setLoading(true);
+      try {
+        const res = await fetch('/api/extract', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, docType, fields }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Extraction failed');
+        lastResult = data;
+        incUses();
+        updateFreeNote();
+        renderResult(data);
+        if (getUses() >= MAX_FREE) {
+          setTimeout(() => document.getElementById('paywall').classList.add('visible'), 600);
+        }
+      } catch (err) {
+        showError(err.message || 'Something went wrong. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function renderResult(data) {
+      const fields = data.fields || [];
+      const high = fields.filter(f => f.confidence === 'High').length;
+      const medium = fields.filter(f => f.confidence === 'Medium').length;
+      const found = fields.filter(f => f.value && f.value !== 'Not found' && f.value !== null).length;
+
+      // Summary stats
+      document.getElementById('summary-row').innerHTML = `
+        <div class="summary-stat"><div class="stat-val">${fields.length}</div><div class="stat-label">Fields Requested</div></div>
+        <div class="summary-stat"><div class="stat-val">${found}</div><div class="stat-label">Fields Found</div></div>
+        <div class="summary-stat"><div class="stat-val">${high}</div><div class="stat-label">High Confidence</div></div>
+        <div class="summary-stat"><div class="stat-val">${medium}</div><div class="stat-label">Medium Confidence</div></div>
+      `;
+
+      // Table rows
+      const tbody = document.getElementById('extract-tbody');
+      tbody.innerHTML = fields.map(f => {
+        const val = f.value || 'Not found';
+        const isNotFound = !f.value || f.value === 'Not found' || f.value === null;
+        const conf = (f.confidence || 'Low').toLowerCase();
+        const snippet = f.snippet ? `<div class="snippet-text">${escapeHtml(f.snippet)}</div>` : '<span style="color:var(--muted);font-size:12px">—</span>';
+        return `<tr>
+          <td class="field-name">${escapeHtml(f.name)}</td>
+          <td class="field-value${isNotFound ? ' not-found' : ''}">${escapeHtml(val)}</td>
+          <td><span class="confidence ${conf}">${f.confidence || 'Low'}</span></td>
+          <td>${snippet}</td>
+        </tr>`;
+      }).join('');
+
+      // Raw excerpt
+      document.getElementById('raw-text').textContent = data.rawExcerpt || '';
+
+      document.getElementById('output-section').classList.add('visible');
+      document.getElementById('output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('error-box');
+      box.textContent = msg;
+      box.classList.add('visible');
+    }
+
+    function setLoading(on) {
+      document.getElementById('loader').classList.toggle('visible', on);
+      document.getElementById('extract-btn').disabled = on;
+    }
+
+    function copyJSON() {
+      if (!lastResult) return;
+      navigator.clipboard.writeText(JSON.stringify(lastResult.fields, null, 2));
+      flash('Copy as JSON', 'Copied!');
+    }
+
+    function copyCSV() {
+      if (!lastResult) return;
+      navigator.clipboard.writeText(toCSV(lastResult.fields));
+      flash('Copy as CSV', 'Copied!');
+    }
+
+    function downloadCSV() {
+      if (!lastResult) return;
+      const blob = new Blob([toCSV(lastResult.fields)], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'extracted-data.csv';
+      a.click();
+    }
+
+    function toCSV(fields) {
+      const header = 'Field,Value,Confidence,Snippet';
+      const rows = fields.map(f => [f.name, f.value || '', f.confidence || 'Low', f.snippet || ''].map(csvCell).join(','));
+      return [header, ...rows].join('\n');
+    }
+
+    function csvCell(val) {
+      const s = String(val).replace(/"/g, '""');
+      return /[,"\n]/.test(s) ? `"${s}"` : s;
+    }
+
+    function flash(selector, msg) {
+      const btn = [...document.querySelectorAll('.btn-action')].find(b => b.textContent.trim() === selector);
+      if (!btn) return;
+      const orig = btn.textContent;
+      btn.textContent = msg;
+      setTimeout(() => { btn.textContent = orig; }, 1500);
+    }
+
+    // Allow Ctrl+Enter to extract
+    document.getElementById('doc-text').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) runExtract();
+    });
+  </script>
+</body>
+</html>
