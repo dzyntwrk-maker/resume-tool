@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Media Batch Generator — Create Weeks of Content in Seconds</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0f1e; --surface: #111827; --border: #1f2937; --accent: #6366f1; --accent2: #8b5cf6; --text: #f1f5f9; --muted: #64748b; --green: #10b981; --red: #ef4444; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+
+    /* Nav */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 16px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 13px; text-decoration: none; font-weight: 600; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* Hero */
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+
+    /* App */
+    .app { max-width: 920px; margin: 40px auto; padding: 0 20px; }
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 28px 28px 0; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } nav { padding: 16px 20px; } .nav-links { display: none; } }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    input, select, textarea { background: #0d1425; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .15s; font-family: inherit; width: 100%; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+
+    /* Platform checkboxes */
+    .platform-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .platform-chip { position: relative; }
+    .platform-chip input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .platform-chip label {
+      display: flex; align-items: center; gap: 6px;
+      background: #0d1425; border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      color: var(--muted); text-transform: none; letter-spacing: 0;
+      transition: border-color .15s, color .15s, background .15s;
+      white-space: nowrap;
+    }
+    .platform-chip input:checked + label { border-color: var(--accent); color: #a5b4fc; background: rgba(99,102,241,.1); }
+    .platform-chip label:hover { border-color: var(--accent); color: var(--text); }
+
+    /* Generate bar */
+    .generate-bar { padding: 20px 28px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .btn-generate { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+    .usage-bar-wrap { width: 100%; }
+    .usage-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .usage-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .usage-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .3s; }
+
+    /* Loader */
+    .loader { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; padding: 20px 28px; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .error-box { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; margin: 0 28px 16px; display: none; }
+    .error-box.visible { display: block; }
+
+    /* Paywall */
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); border: 1px solid rgba(99,102,241,.25); border-radius: 16px; padding: 32px 28px; margin: 0 28px 28px; display: none; text-align: center; }
+    .paywall.visible { display: block; }
+    .paywall-icon { font-size: 36px; margin-bottom: 12px; }
+    .paywall h3 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .paywall p { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.6; max-width: 360px; margin-left: auto; margin-right: auto; }
+    .price-row { font-size: 40px; font-weight: 900; color: var(--accent); margin-bottom: 6px; }
+    .price-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .paywall-features { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 24px; }
+    .paywall-feat { background: rgba(99,102,241,.12); color: #a5b4fc; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; text-decoration: none; display: inline-block; }
+    .btn-pay:hover { opacity: .88; }
+
+    /* Output */
+    .output-section { padding: 0 28px 28px; display: none; }
+    .output-section.visible { display: block; }
+    .output-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+    .output-header h3 { font-size: 16px; font-weight: 700; }
+    .output-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-copy-all { background: var(--accent); color: white; border: none; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-copy-all:hover { opacity: .85; }
+    .btn-download { background: transparent; border: 1px solid var(--border); color: var(--text); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: border-color .15s; }
+    .btn-download:hover { border-color: var(--accent); }
+
+    /* Post cards */
+    .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; }
+    @media (max-width: 640px) { .posts-grid { grid-template-columns: 1fr; } }
+    .post-card { background: #0d1425; border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .post-card-header { display: flex; align-items: center; justify-content: space-between; }
+    .platform-label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; }
+    .platform-icon { font-size: 16px; }
+    .type-badge { display: inline-block; background: rgba(99,102,241,.2); color: #a5b4fc; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: .5px; }
+    .post-text { font-size: 14px; color: #cbd5e1; line-height: 1.6; white-space: pre-wrap; }
+    .post-hashtags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .hashtag-pill { background: rgba(99,102,241,.12); color: #818cf8; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
+    .post-meta { display: flex; align-items: center; justify-content: space-between; }
+    .best-time { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--muted); }
+    .best-time svg { flex-shrink: 0; }
+    .btn-copy-post { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; transition: border-color .15s; white-space: nowrap; }
+    .btn-copy-post:hover { border-color: var(--accent); }
+
+    footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 60px; }
+    footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">AI Tools</a>
+    <div class="nav-links">
+      <a href="/tools.html">All Tools</a>
+      <a href="/ad-copy.html">Ad Copy</a>
+      <a href="/email-sequences.html">Email Sequences</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="badge">Social Media Batch Generator</div>
+    <h1>Weeks of Content. <span>One Click.</span></h1>
+    <p>Generate platform-optimized social media posts in bulk — with hashtags, best posting times, and content tailored to your brand and audience.</p>
+  </div>
+
+  <div class="app">
+    <div class="app-card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="brandName">Brand / Business Name</label>
+          <input type="text" id="brandName" placeholder="e.g. Luminary Skincare" />
+        </div>
+        <div class="form-group">
+          <label for="niche">Niche / Industry</label>
+          <input type="text" id="niche" placeholder="e.g. Clean Beauty, SaaS, Fitness" />
+        </div>
+        <div class="form-group full">
+          <label for="topic">Content Topic or Theme</label>
+          <input type="text" id="topic" placeholder="e.g. summer skincare routine, productivity hacks, customer success stories" />
+        </div>
+        <div class="form-group full">
+          <label>Platforms</label>
+          <div class="platform-grid">
+            <div class="platform-chip">
+              <input type="checkbox" id="plat-instagram" value="Instagram" checked />
+              <label for="plat-instagram"><span class="platform-icon">📸</span> Instagram</label>
+            </div>
+            <div class="platform-chip">
+              <input type="checkbox" id="plat-twitter" value="Twitter-X" />
+              <label for="plat-twitter"><span class="platform-icon">𝕏</span> Twitter / X</label>
+            </div>
+            <div class="platform-chip">
+              <input type="checkbox" id="plat-linkedin" value="LinkedIn" />
+              <label for="plat-linkedin"><span class="platform-icon">💼</span> LinkedIn</label>
+            </div>
+            <div class="platform-chip">
+              <input type="checkbox" id="plat-facebook" value="Facebook" />
+              <label for="plat-facebook"><span class="platform-icon">👥</span> Facebook</label>
+            </div>
+            <div class="platform-chip">
+              <input type="checkbox" id="plat-tiktok" value="TikTok" />
+              <label for="plat-tiktok"><span class="platform-icon">🎵</span> TikTok</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="postCount">Number of Posts</label>
+          <select id="postCount">
+            <option value="5">5 posts</option>
+            <option value="10">10 posts</option>
+            <option value="15">15 posts</option>
+            <option value="30">30 posts</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="contentType">Content Type</label>
+          <select id="contentType">
+            <option value="mixed">Mixed (Recommended)</option>
+            <option value="educational">Educational</option>
+            <option value="promotional">Promotional</option>
+            <option value="engaging">Engaging / Interactive</option>
+            <option value="storytelling">Storytelling</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="generate-bar">
+        <button class="btn-generate" id="generateBtn" onclick="generate()">Generate Posts</button>
+        <div>
+          <div class="free-note" id="freeNote">5 free posts · No account needed</div>
+        </div>
+        <div class="usage-bar-wrap" id="usageWrap" style="display:none;">
+          <div class="usage-label" id="usageLabel"></div>
+          <div class="usage-bar"><div class="usage-fill" id="usageFill"></div></div>
+        </div>
+      </div>
+
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <span id="loaderText">Generating your posts…</span>
+      </div>
+
+      <div class="error-box" id="errorBox"></div>
+
+      <div class="paywall" id="paywall">
+        <div class="paywall-icon">🚀</div>
+        <h3>You've Used Your Free Posts</h3>
+        <p>Unlock unlimited social media content generation — create 30-post batches across all platforms, every day.</p>
+        <div class="price-row">$29<span style="font-size:18px;color:var(--muted)">/month</span></div>
+        <div class="price-sub">Cancel anytime · Instant access</div>
+        <div class="paywall-features">
+          <span class="paywall-feat">Unlimited Posts</span>
+          <span class="paywall-feat">All 5 Platforms</span>
+          <span class="paywall-feat">AI-Powered</span>
+          <span class="paywall-feat">Hashtag Sets</span>
+          <span class="paywall-feat">Best Time Suggestions</span>
+          <span class="paywall-feat">Bulk Download</span>
+        </div>
+        <a class="btn-pay" href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">Unlock Unlimited Access →</a>
+      </div>
+
+      <div class="output-section" id="outputSection">
+        <div class="output-header">
+          <h3 id="outputTitle">Generated Posts</h3>
+          <div class="output-actions">
+            <button class="btn-copy-all" onclick="copyAll()">Copy All</button>
+            <button class="btn-download" onclick="downloadTxt()">Download .txt</button>
+          </div>
+        </div>
+        <div class="posts-grid" id="postsGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Part of the <a href="/">AI Tools Suite</a> · <a href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">Unlock Pro</a></p>
+  </footer>
+
+  <script>
+    const FREE_LIMIT = 5;
+    const PAYHIP_URL = 'https://payhip.com/b/gFaqD';
+    const STORAGE_KEY = 'sm_posts_used';
+
+    let postsData = [];
+
+    function getUsed() { return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10); }
+    function addUsed(n) { localStorage.setItem(STORAGE_KEY, getUsed() + n); }
+
+    function updateUsageUI() {
+      const used = getUsed();
+      const wrap = document.getElementById('usageWrap');
+      const label = document.getElementById('usageLabel');
+      const fill = document.getElementById('usageFill');
+      const freeNote = document.getElementById('freeNote');
+
+      if (used === 0) {
+        wrap.style.display = 'none';
+        freeNote.style.display = 'block';
+        return;
+      }
+      freeNote.style.display = 'none';
+      wrap.style.display = 'block';
+      const pct = Math.min((used / FREE_LIMIT) * 100, 100);
+      fill.style.width = pct + '%';
+      fill.style.background = used >= FREE_LIMIT ? '#ef4444' : 'var(--accent)';
+      label.textContent = used >= FREE_LIMIT
+        ? `Free limit reached (${used}/${FREE_LIMIT} posts used)`
+        : `${used} / ${FREE_LIMIT} free posts used`;
+    }
+
+    function getSelectedPlatforms() {
+      const checkboxes = document.querySelectorAll('.platform-chip input[type="checkbox"]:checked');
+      return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    async function generate() {
+      const brandName = document.getElementById('brandName').value.trim();
+      const niche = document.getElementById('niche').value.trim();
+      const topic = document.getElementById('topic').value.trim();
+      const platforms = getSelectedPlatforms();
+      const count = parseInt(document.getElementById('postCount').value, 10);
+      const contentType = document.getElementById('contentType').value;
+
+      if (!brandName || !niche || !topic) {
+        showError('Please fill in your brand name, niche, and topic.');
+        return;
+      }
+      if (platforms.length === 0) {
+        showError('Please select at least one platform.');
+        return;
+      }
+
+      const used = getUsed();
+      if (used >= FREE_LIMIT) {
+        document.getElementById('outputSection').classList.remove('visible');
+        document.getElementById('paywall').classList.add('visible');
+        return;
+      }
+
+      hideError();
+      document.getElementById('outputSection').classList.remove('visible');
+      document.getElementById('paywall').classList.remove('visible');
+      document.getElementById('loader').classList.add('visible');
+      document.getElementById('generateBtn').disabled = true;
+      document.getElementById('loaderText').textContent = `Generating ${count} posts…`;
+
+      try {
+        const resp = await fetch('/api/social', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ brandName, niche, topic, platforms, count, contentType }),
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({}));
+          throw new Error(err.error || 'Generation failed');
+        }
+
+        const data = await resp.json();
+        postsData = data.posts || [];
+
+        addUsed(postsData.length);
+        updateUsageUI();
+
+        renderPosts(postsData);
+
+        const newUsed = getUsed();
+        if (newUsed >= FREE_LIMIT) {
+          document.getElementById('paywall').classList.add('visible');
+        }
+      } catch (e) {
+        showError(e.message || 'Something went wrong. Please try again.');
+      } finally {
+        document.getElementById('loader').classList.remove('visible');
+        document.getElementById('generateBtn').disabled = false;
+      }
+    }
+
+    function renderPosts(posts) {
+      const grid = document.getElementById('postsGrid');
+      const section = document.getElementById('outputSection');
+      const title = document.getElementById('outputTitle');
+
+      title.textContent = `${posts.length} Posts Generated`;
+      grid.innerHTML = '';
+
+      posts.forEach((post, i) => {
+        const card = document.createElement('div');
+        card.className = 'post-card';
+
+        const hashtagsHtml = post.hashtags.map(h =>
+          `<span class="hashtag-pill">${h}</span>`
+        ).join('');
+
+        card.innerHTML = `
+          <div class="post-card-header">
+            <div class="platform-label">
+              <span class="platform-icon">${post.icon || ''}</span>
+              <span>${post.platform}</span>
+            </div>
+            <span class="type-badge">${post.type}</span>
+          </div>
+          <div class="post-text">${escHtml(post.text)}</div>
+          ${post.hashtags.length ? `<div class="post-hashtags">${hashtagsHtml}</div>` : ''}
+          <div class="post-meta">
+            <div class="best-time">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Best time: ${escHtml(post.bestTime)}
+            </div>
+            <button class="btn-copy-post" onclick="copyPost(${i})">Copy</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      section.classList.add('visible');
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function postToText(post) {
+      const lines = [
+        `Platform: ${post.platform}`,
+        `Type: ${post.type}`,
+        `Best Time: ${post.bestTime}`,
+        '',
+        post.text,
+        '',
+        post.hashtags.join(' '),
+      ];
+      return lines.join('\n').trim();
+    }
+
+    function copyPost(index) {
+      const post = postsData[index];
+      if (!post) return;
+      navigator.clipboard.writeText(postToText(post)).then(() => {
+        const btns = document.querySelectorAll('.btn-copy-post');
+        const btn = btns[index];
+        if (btn) {
+          const orig = btn.textContent;
+          btn.textContent = 'Copied!';
+          setTimeout(() => { btn.textContent = orig; }, 1500);
+        }
+      });
+    }
+
+    function copyAll() {
+      const text = postsData.map((p, i) =>
+        `POST ${i + 1}\n${'─'.repeat(40)}\n${postToText(p)}`
+      ).join('\n\n');
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.btn-copy-all');
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = orig; }, 1500);
+      });
+    }
+
+    function downloadTxt() {
+      const brandName = document.getElementById('brandName').value.trim() || 'brand';
+      const text = postsData.map((p, i) =>
+        `POST ${i + 1}\n${'─'.repeat(40)}\n${postToText(p)}`
+      ).join('\n\n');
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${brandName.replace(/\s+/g, '-').toLowerCase()}-social-posts.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('errorBox');
+      box.textContent = msg;
+      box.classList.add('visible');
+    }
+
+    function hideError() {
+      document.getElementById('errorBox').classList.remove('visible');
+    }
+
+    // Allow Enter key on inputs to trigger generation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.tagName === 'INPUT') generate();
+    });
+
+    updateUsageUI();
+  </script>
+</body>
+</html>

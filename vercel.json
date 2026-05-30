@@ -8,6 +8,7 @@
     { "source": "/email-sequences", "destination": "/email-sequences.html" },
     { "source": "/product-descriptions", "destination": "/product-descriptions.html" },
     { "source": "/ad-copy", "destination": "/ad-copy.html" },
+    { "source": "/social-media", "destination": "/social-media.html" },
     { "source": "/tools", "destination": "/tools.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MeetingAI — Instant Meeting Summaries & Action Items</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0f1e; --surface: #111827; --border: #1f2937; --accent: #6366f1; --text: #f1f5f9; --muted: #64748b; --green: #10b981; --yellow: #f59e0b; --red: #ef4444; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 16px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 13px; text-decoration: none; font-weight: 600; }
+    .nav-links a:hover { color: var(--text); }
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+    .app { max-width: 920px; margin: 40px auto; padding: 0 20px; }
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 24px 28px; }
+    @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } nav { padding: 16px 20px; } }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    textarea, input, select { background: #0d1425; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .15s; font-family: inherit; resize: vertical; }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+    .generate-bar { padding: 0 28px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .btn-generate { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+    .loader { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; padding: 20px 0; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .error-box { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; margin: 0 28px 16px; display: none; }
+    .error-box.visible { display: block; }
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); border: 1px solid rgba(99,102,241,.25); border-radius: 16px; padding: 28px; margin: 0 28px 28px; display: none; text-align: center; }
+    .paywall.visible { display: block; }
+    .paywall h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .paywall p { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+    .price-row { font-size: 36px; font-weight: 900; color: var(--accent); margin-bottom: 16px; }
+    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+    .output-section { padding: 0 28px 28px; display: none; }
+    .output-section.visible { display: block; }
+    .output-toolbar { display: flex; gap: 8px; justify-content: flex-end; margin-bottom: 20px; flex-wrap: wrap; }
+    .btn-action { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s; }
+    .btn-action:hover { border-color: var(--accent); }
+    .btn-action.primary { background: var(--accent); border-color: var(--accent); color: white; }
+    .score-card { background: linear-gradient(135deg, rgba(99,102,241,.1), rgba(139,92,246,.1)); border: 1px solid rgba(99,102,241,.25); border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 16px; }
+    .score-ring { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; flex-shrink: 0; }
+    .score-label { font-size: 14px; color: var(--muted); margin-top: 2px; }
+    .output-card { background: #0d1425; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 14px; }
+    .output-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--accent); margin-bottom: 12px; }
+    .output-text { font-size: 14px; line-height: 1.7; color: #cbd5e1; white-space: pre-wrap; }
+    .action-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .action-table th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+    .action-table td { padding: 10px 12px; border-bottom: 1px solid rgba(31,41,55,.6); vertical-align: top; }
+    .action-table tr:last-child td { border-bottom: none; }
+    .priority-high { color: #fca5a5; font-weight: 700; }
+    .priority-medium { color: #fde68a; font-weight: 700; }
+    .priority-low { color: #6ee7b7; font-weight: 700; }
+    .card-actions { margin-top: 10px; }
+    .btn-copy { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .btn-copy:hover { border-color: var(--accent); }
+    footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 60px; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">AI Tools</a>
+    <div class="nav-links">
+      <a href="/tools.html">All Tools</a>
+      <a href="/email-sequences.html">Email Sequences</a>
+      <a href="/seo-writer.html">SEO Writer</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="badge">Meeting Intelligence</div>
+    <h1>Turn Any Meeting Into<br><span>Clear Action Items</span></h1>
+    <p>Paste your transcript or notes — get an executive summary, action items with owners, key decisions, and next steps in seconds.</p>
+  </div>
+
+  <div class="app">
+    <div class="app-card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Meeting Title</label>
+          <input type="text" id="title" placeholder="e.g. Q3 Product Roadmap Review" />
+        </div>
+        <div class="form-group">
+          <label>Meeting Type</label>
+          <select id="meeting-type">
+            <option value="team">Team Meeting</option>
+            <option value="standup">Daily Standup</option>
+            <option value="sales">Sales Call</option>
+            <option value="client">Client Meeting</option>
+            <option value="board">Board Meeting</option>
+            <option value="retrospective">Retrospective</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Attendees (comma separated)</label>
+          <input type="text" id="attendees" placeholder="e.g. Sarah, Mike, Lisa, John" />
+        </div>
+        <div class="form-group full">
+          <label>Transcript / Notes *</label>
+          <textarea id="transcript" rows="8" placeholder="Paste your meeting transcript, notes, or a summary of what was discussed..."></textarea>
+        </div>
+      </div>
+
+      <div class="generate-bar">
+        <button class="btn-generate" id="generate-btn" onclick="generate()">Summarize Meeting ✨</button>
+        <span class="free-note" id="free-note">2 free summaries included</span>
+      </div>
+
+      <div class="loader" id="loader"><div class="spinner"></div><span id="loader-text">Reading transcript…</span></div>
+      <div class="error-box" id="error-box"></div>
+
+      <div class="paywall" id="paywall">
+        <h3>Unlock Unlimited Summaries</h3>
+        <p>Never lose track of action items again. Unlimited meetings for one low price.</p>
+        <div class="price-row">$29<span style="font-size:18px;font-weight:400;color:var(--muted)">/mo</span></div>
+        <button class="btn-pay" onclick="window.open('https://payhip.com/b/gFaqD','_blank')">Unlock Unlimited — $29/mo →</button>
+      </div>
+
+      <div class="output-section" id="output-section">
+        <div class="output-toolbar">
+          <button class="btn-action" onclick="copyMarkdown()">📋 Copy as Markdown</button>
+          <button class="btn-action" onclick="downloadMd()">⬇ Download .md</button>
+        </div>
+
+        <div class="score-card" id="score-card">
+          <div class="score-ring" id="score-ring"></div>
+          <div>
+            <div style="font-size:15px;font-weight:700;">Meeting Score</div>
+            <div class="score-label" id="score-label"></div>
+          </div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Executive Summary</div>
+          <div class="output-text" id="out-summary"></div>
+          <div class="card-actions"><button class="btn-copy" onclick="copyEl('out-summary',this)">📋 Copy</button></div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Action Items</div>
+          <table class="action-table" id="action-table">
+            <thead><tr><th>Task</th><th>Owner</th><th>Due</th><th>Priority</th></tr></thead>
+            <tbody id="action-body"></tbody>
+          </table>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Key Decisions</div>
+          <div class="output-text" id="out-decisions"></div>
+          <div class="card-actions"><button class="btn-copy" onclick="copyEl('out-decisions',this)">📋 Copy</button></div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Follow-up Questions</div>
+          <div class="output-text" id="out-questions"></div>
+        </div>
+
+        <div class="output-card">
+          <div class="output-label">Next Steps</div>
+          <div class="output-text" id="out-next"></div>
+          <div class="card-actions"><button class="btn-copy" onclick="copyEl('out-next',this)">📋 Copy</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Part of the <a href="/tools.html" style="color:var(--accent);text-decoration:none;">AI Tools Suite</a> — Powered by Claude AI</p>
+  </footer>
+
+  <script>
+    let usesRemaining = parseInt(localStorage.getItem("meeting_uses") ?? "2");
+    let lastData = null;
+
+    function updateNote() {
+      const n = document.getElementById("free-note");
+      if (usesRemaining <= 0) { n.textContent = "No summaries left — unlock more below"; n.style.color = "#f87171"; }
+      else { n.textContent = `${usesRemaining} free summar${usesRemaining !== 1 ? "ies" : "y"} remaining`; }
+    }
+    updateNote();
+
+    function showError(msg) {
+      const el = document.getElementById("error-box");
+      el.textContent = msg; el.classList.add("visible");
+      setTimeout(() => el.classList.remove("visible"), 6000);
+    }
+
+    function esc(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+    function copyEl(id, btn) {
+      navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
+        btn.textContent = "✅ Copied!"; setTimeout(() => { btn.textContent = "📋 Copy"; }, 2000);
+      });
+    }
+
+    function copyMarkdown() {
+      if (!lastData) return;
+      const d = lastData;
+      const title = document.getElementById("title").value.trim() || "Meeting Summary";
+      const md = [
+        `# ${title}`,
+        "",
+        "## Executive Summary",
+        d.summary || "",
+        "",
+        "## Action Items",
+        "| Task | Owner | Due | Priority |",
+        "|---|---|---|---|",
+        ...(d.actionItems||[]).map(a => `| ${a.task} | ${a.owner||"-"} | ${a.due||"-"} | ${a.priority||"-"} |`),
+        "",
+        "## Key Decisions",
+        d.decisions || "",
+        "",
+        "## Follow-up Questions",
+        d.questions || "",
+        "",
+        "## Next Steps",
+        d.nextSteps || "",
+      ].join("\n");
+      navigator.clipboard.writeText(md).then(() => {
+        const btns = document.querySelectorAll(".btn-action");
+        btns[0].textContent = "✅ Copied!"; setTimeout(() => { btns[0].textContent = "📋 Copy as Markdown"; }, 2000);
+      });
+    }
+
+    function downloadMd() {
+      if (!lastData) return;
+      const d = lastData;
+      const title = document.getElementById("title").value.trim() || "meeting-summary";
+      const md = `# ${title}\n\n## Summary\n${d.summary}\n\n## Action Items\n${(d.actionItems||[]).map(a=>`- [ ] ${a.task} | ${a.owner||"TBD"} | ${a.due||"TBD"}`).join("\n")}\n\n## Decisions\n${d.decisions}\n\n## Questions\n${d.questions}\n\n## Next Steps\n${d.nextSteps}`;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([md], {type:"text/markdown"}));
+      a.download = `${title.replace(/\s+/g,"-").toLowerCase()}.md`;
+      a.click();
+    }
+
+    function renderScore(score) {
+      const ring = document.getElementById("score-ring");
+      const label = document.getElementById("score-label");
+      const s = Math.min(10, Math.max(1, parseInt(score) || 7));
+      const color = s >= 8 ? "#10b981" : s >= 6 ? "#f59e0b" : "#ef4444";
+      ring.style.background = `conic-gradient(${color} ${s*36}deg, #1f2937 0deg)`;
+      ring.textContent = s;
+      ring.style.color = color;
+      label.textContent = s >= 8 ? "High engagement meeting" : s >= 6 ? "Moderate engagement" : "Low engagement — consider shorter meetings";
+    }
+
+    async function generate() {
+      const transcript = document.getElementById("transcript").value.trim();
+      if (!transcript) { showError("Please paste your meeting transcript or notes."); return; }
+
+      if (usesRemaining <= 0) {
+        document.getElementById("paywall").classList.add("visible");
+        document.getElementById("paywall").scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+
+      document.getElementById("generate-btn").disabled = true;
+      document.getElementById("output-section").classList.remove("visible");
+      document.getElementById("error-box").classList.remove("visible");
+      document.getElementById("paywall").classList.remove("visible");
+
+      const texts = ["Reading transcript…", "Identifying action items…", "Extracting decisions…", "Writing summary…", "Finalizing…"];
+      let li = 0;
+      document.getElementById("loader").classList.add("visible");
+      document.getElementById("loader-text").textContent = texts[0];
+      const interval = setInterval(() => { li=(li+1)%texts.length; document.getElementById("loader-text").textContent = texts[li]; }, 1800);
+
+      try {
+        const res = await fetch("/api/meeting", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            transcript,
+            title: document.getElementById("title").value.trim(),
+            attendees: document.getElementById("attendees").value.trim(),
+            meetingType: document.getElementById("meeting-type").value,
+          }),
+        });
+        clearInterval(interval);
+        document.getElementById("loader").classList.remove("visible");
+        if (!res.ok) throw new Error((await res.json().catch(()=>({}))).error || `Error ${res.status}`);
+        const data = await res.json();
+        lastData = data;
+
+        usesRemaining--;
+        localStorage.setItem("meeting_uses", usesRemaining.toString());
+        updateNote();
+
+        renderScore(data.score);
+        document.getElementById("out-summary").textContent = data.summary || "";
+        document.getElementById("out-decisions").textContent = data.decisions || "";
+        document.getElementById("out-questions").textContent = data.questions || "";
+        document.getElementById("out-next").textContent = data.nextSteps || "";
+
+        const tbody = document.getElementById("action-body");
+        tbody.innerHTML = (data.actionItems || []).map(a => `
+          <tr>
+            <td>${esc(a.task)}</td>
+            <td>${esc(a.owner||"TBD")}</td>
+            <td>${esc(a.due||"ASAP")}</td>
+            <td class="priority-${(a.priority||"medium").toLowerCase()}">${esc(a.priority||"Medium")}</td>
+          </tr>
+        `).join("");
+
+        document.getElementById("output-section").classList.add("visible");
+      } catch(err) {
+        clearInterval(interval);
+        document.getElementById("loader").classList.remove("visible");
+        showError("Error: " + err.message);
+      } finally {
+        document.getElementById("generate-btn").disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
