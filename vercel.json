@@ -14,6 +14,8 @@
     { "source": "/meeting-summarizer", "destination": "/meeting-summarizer.html" },
     { "source": "/newsletter-builder", "destination": "/newsletter-builder.html" },
     { "source": "/lead-qualifier", "destination": "/lead-qualifier.html" },
+    { "source": "/code-reviewer", "destination": "/code-reviewer.html" },
+    { "source": "/contract-analyzer", "destination": "/contract-analyzer.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
