@@ -14,6 +14,8 @@ export default function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.setHeader("X-Content-Type-Options", "nosniff");
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -23,6 +25,10 @@ export default function handler(req, res) {
 
   if (!normalized) {
     return res.status(400).json({ valid: false, error: "No code provided" });
+  }
+
+  if (normalized.length > 100) {
+    return res.status(400).json({ valid: false, error: "Invalid code format" });
   }
 
   return res.status(200).json({ valid: VALID_CODES.has(normalized) });

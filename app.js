@@ -29,7 +29,8 @@ function showError(msg) {
   const el = document.getElementById("error-box");
   el.textContent = msg;
   el.classList.add("visible");
-  setTimeout(() => el.classList.remove("visible"), 6000);
+  el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  setTimeout(() => el.classList.remove("visible"), 7000);
 }
 
 function switchTab(tabId) {
@@ -122,8 +123,30 @@ async function generate() {
   const tone = document.getElementById("tone").value;
   const outputType = document.getElementById("output-type").value;
 
-  if (!resume) { showError("Please paste your resume."); return; }
-  if (!jobDesc) { showError("Please paste the job description."); return; }
+  if (!resume) {
+    showError("Please paste your resume.");
+    return;
+  }
+  if (!jobDesc) {
+    showError("Please paste the job description.");
+    return;
+  }
+  if (resume.length < 100) {
+    showError("Resume is too short. Please provide at least 100 characters.");
+    return;
+  }
+  if (jobDesc.length < 100) {
+    showError("Job description is too short. Please provide at least 100 characters.");
+    return;
+  }
+  if (resume.length > 50000) {
+    showError("Resume is too long. Please keep it under 50,000 characters.");
+    return;
+  }
+  if (jobDesc.length > 10000) {
+    showError("Job description is too long. Please keep it under 10,000 characters.");
+    return;
+  }
 
   if (usesRemaining <= 0) {
     document.getElementById("paywall").classList.add("visible");
@@ -154,7 +177,8 @@ async function generate() {
     const response = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ resume, jobDesc, name, role, tone, outputType })
+      body: JSON.stringify({ resume, jobDesc, name, role, tone, outputType }),
+      signal: AbortSignal.timeout(60000)
     });
 
     clearInterval(loaderInterval);
@@ -162,7 +186,8 @@ async function generate() {
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error || `Server error ${response.status}`);
+      const errorMsg = err.error || `Error ${response.status}`;
+      throw new Error(errorMsg);
     }
 
     const data = await response.json();

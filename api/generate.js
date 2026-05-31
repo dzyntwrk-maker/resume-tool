@@ -134,12 +134,28 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const { resume, jobDesc, name, role, tone, outputType } = req.body || {};
+
+  // Validate inputs
   if (!resume?.trim() || !jobDesc?.trim()) {
     return res.status(400).json({ error: "Resume and job description are required." });
+  }
+
+  const resumeLen = resume.trim().length;
+  const jobLen = jobDesc.trim().length;
+
+  if (resumeLen > 50000 || jobLen > 10000) {
+    return res.status(400).json({ error: "Input text is too long. Please reduce the content." });
+  }
+
+  if (resumeLen < 100 || jobLen < 100) {
+    return res.status(400).json({ error: "Please provide more detailed information." });
   }
 
   // Try Claude if API key is available
@@ -158,7 +174,10 @@ export default async function handler(req, res) {
       return res.status(200).json(parseOutput(rawText, outputType || "both"));
     } catch (err) {
       console.error("Claude API error:", err?.message);
-      // Fall through to template
+      if (err?.message?.includes("401") || err?.message?.includes("authentication")) {
+        return res.status(500).json({ error: "API key configuration issue. Using template mode." });
+      }
+      // Fall through to template for other errors
     }
   }
 
