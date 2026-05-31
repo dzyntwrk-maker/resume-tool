@@ -16,6 +16,10 @@
     { "source": "/lead-qualifier", "destination": "/lead-qualifier.html" },
     { "source": "/code-reviewer", "destination": "/code-reviewer.html" },
     { "source": "/contract-analyzer", "destination": "/contract-analyzer.html" },
+    { "source": "/job-tracker", "destination": "/job-tracker.html" },
+    { "source": "/affiliate-writer", "destination": "/affiliate-writer.html" },
+    { "source": "/prompt-library", "destination": "/prompt-library.html" },
+    { "source": "/api-docs", "destination": "/api-docs.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

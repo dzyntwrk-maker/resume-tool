@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tools API — Developer Documentation</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0f1e; --surface: #111827; --border: #1f2937; --accent: #6366f1; --text: #f1f5f9; --muted: #64748b; --green: #10b981; --yellow: #f59e0b; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; display: flex; flex-direction: column; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 20; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-cta { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-decoration: none; }
+    .layout { display: flex; flex: 1; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .sidebar { width: 240px; flex-shrink: 0; padding: 32px 0; border-right: 1px solid var(--border); position: sticky; top: 57px; height: calc(100vh - 57px); overflow-y: auto; }
+    .sidebar-section { margin-bottom: 24px; padding: 0 20px; }
+    .sidebar-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 10px; }
+    .sidebar-link { display: block; font-size: 13px; color: var(--muted); text-decoration: none; padding: 5px 8px; border-radius: 6px; margin-bottom: 2px; transition: color .15s, background .15s; }
+    .sidebar-link:hover, .sidebar-link.active { color: var(--accent); background: rgba(99,102,241,.08); }
+    .content { flex: 1; padding: 48px 48px 80px; max-width: 860px; }
+    h1 { font-size: 36px; font-weight: 900; margin-bottom: 16px; }
+    h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    h2 { font-size: 22px; font-weight: 800; margin: 48px 0 16px; padding-top: 48px; border-top: 1px solid var(--border); }
+    h2:first-of-type { border-top: none; padding-top: 0; }
+    h3 { font-size: 16px; font-weight: 700; margin: 24px 0 10px; color: var(--text); }
+    p { color: var(--muted); font-size: 15px; line-height: 1.7; margin-bottom: 16px; }
+    .badge-row { display: flex; gap: 10px; margin-bottom: 32px; flex-wrap: wrap; }
+    .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-green { background: rgba(16,185,129,.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,.25); }
+    .badge-blue { background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.25); }
+    .badge-yellow { background: rgba(245,158,11,.15); color: #fde68a; border: 1px solid rgba(245,158,11,.25); }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 24px 0; }
+    .pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .pricing-card.featured { border-color: var(--accent); }
+    .plan-name { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 8px; }
+    .plan-price { font-size: 28px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+    .plan-rate { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+    .plan-feature { font-size: 13px; color: var(--muted); padding: 4px 0; border-bottom: 1px solid rgba(31,41,55,.5); }
+    .plan-feature:last-child { border-bottom: none; }
+    .plan-feature strong { color: var(--text); }
+    .btn-plan { display: block; text-align: center; background: var(--accent); color: white; border: none; padding: 10px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; margin-top: 16px; transition: opacity .2s; }
+    .btn-plan:hover { opacity: .88; }
+    pre { background: #0d1425; border: 1px solid var(--border); border-radius: 10px; padding: 20px; overflow-x: auto; margin: 12px 0 20px; font-size: 13px; line-height: 1.6; }
+    code { font-family: "SF Mono", "Fira Code", monospace; color: #a5b4fc; }
+    pre code { color: #e2e8f0; }
+    .method { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; font-family: monospace; margin-right: 8px; }
+    .method-post { background: rgba(99,102,241,.2); color: #a5b4fc; }
+    .method-get { background: rgba(16,185,129,.2); color: #6ee7b7; }
+    .endpoint-row { display: flex; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; font-family: monospace; font-size: 13px; }
+    .endpoint-path { color: var(--text); }
+    .endpoint-desc { margin-left: auto; font-family: sans-serif; font-size: 12px; color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0 20px; }
+    th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(31,41,55,.5); vertical-align: top; color: var(--muted); }
+    td:first-child { color: #a5b4fc; font-family: monospace; font-size: 12px; }
+    td strong { color: var(--text); }
+    .tab-btns { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+    .tab-btn { padding: 8px 16px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; transition: color .15s; }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .code-block { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 12px 0 20px; }
+    .code-block .tab-btns { padding: 0 16px; background: #0d1425; }
+    .code-panel { display: none; }
+    .code-panel.active { display: block; }
+    .code-panel pre { border: none; border-radius: 0; margin: 0; }
+    footer { text-align: center; padding: 32px 20px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); }
+    @media (max-width: 768px) { .sidebar { display: none; } .content { padding: 32px 20px; } nav { padding: 16px 20px; } .pricing-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">AI Tools Suite</a>
+    <a class="nav-cta" href="https://payhip.com/b/gFaqD" target="_blank">Get API Key →</a>
+  </nav>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Getting Started</div>
+        <a class="sidebar-link active" href="#overview">Overview</a>
+        <a class="sidebar-link" href="#auth">Authentication</a>
+        <a class="sidebar-link" href="#pricing">Pricing</a>
+        <a class="sidebar-link" href="#errors">Error Handling</a>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Endpoints</div>
+        <a class="sidebar-link" href="#resume">Resume Generator</a>
+        <a class="sidebar-link" href="#seo">SEO Writer</a>
+        <a class="sidebar-link" href="#listing">Listing Generator</a>
+        <a class="sidebar-link" href="#emails">Email Sequences</a>
+        <a class="sidebar-link" href="#adcopy">Ad Copy</a>
+        <a class="sidebar-link" href="#leads">Lead Qualifier</a>
+        <a class="sidebar-link" href="#legal">Legal Docs</a>
+        <a class="sidebar-link" href="#podcast">Podcast Notes</a>
+        <a class="sidebar-link" href="#meeting">Meeting Summary</a>
+        <a class="sidebar-link" href="#contract">Contract Analyzer</a>
+        <a class="sidebar-link" href="#codereview">Code Reviewer</a>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div id="overview">
+        <h1>AI Tools <span>API Reference</span></h1>
+        <div class="badge-row">
+          <span class="badge badge-green">REST API</span>
+          <span class="badge badge-blue">JSON</span>
+          <span class="badge badge-yellow">Claude-Powered</span>
+        </div>
+        <p>All AI Tools are available as REST API endpoints. Integrate resume tailoring, SEO writing, ad copy generation, lead scoring, and more directly into your product or workflow.</p>
+        <p><strong style="color:var(--text)">Base URL:</strong></p>
+        <pre><code>https://resume-tool.vercel.app</code></pre>
+      </div>
+
+      <h2 id="auth">Authentication</h2>
+      <p>Pass your API key in the <code>X-API-Key</code> header on every request.</p>
+      <pre><code>X-API-Key: your_api_key_here
+Content-Type: application/json</code></pre>
+      <p>Get your API key at <a href="https://payhip.com/b/gFaqD" style="color:var(--accent)">payhip.com/b/gFaqD</a> after purchasing a plan.</p>
+
+      <h2 id="pricing">Pricing</h2>
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="plan-name">Free</div>
+          <div class="plan-price">$0</div>
+          <div class="plan-rate">forever</div>
+          <div class="plan-feature"><strong>10</strong> requests/day</div>
+          <div class="plan-feature"><strong>All</strong> endpoints</div>
+          <div class="plan-feature">No auth required</div>
+          <div class="plan-feature">Template fallback only</div>
+          <a class="btn-plan" href="/">Try in Browser</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$29</div>
+          <div class="plan-rate">/month</div>
+          <div class="plan-feature"><strong>1,000</strong> requests/day</div>
+          <div class="plan-feature"><strong>All</strong> endpoints</div>
+          <div class="plan-feature">Claude AI responses</div>
+          <div class="plan-feature">Email support</div>
+          <a class="btn-plan" href="https://payhip.com/b/gFaqD" target="_blank">Get API Key →</a>
+        </div>
+        <div class="pricing-card">
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$99</div>
+          <div class="plan-rate">/month</div>
+          <div class="plan-feature"><strong>Unlimited</strong> requests</div>
+          <div class="plan-feature"><strong>All</strong> endpoints</div>
+          <div class="plan-feature">Priority Claude responses</div>
+          <div class="plan-feature">Priority support + SLA</div>
+          <a class="btn-plan" href="https://payhip.com/b/gFaqD" target="_blank">Get API Key →</a>
+        </div>
+      </div>
+
+      <h2 id="errors">Error Handling</h2>
+      <p>All errors return a JSON body with an <code>error</code> field and an appropriate HTTP status code.</p>
+      <table>
+        <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>400</td><td>Bad request — missing required fields</td></tr>
+          <tr><td>405</td><td>Method not allowed — use POST</td></tr>
+          <tr><td>500</td><td>Server error — try again</td></tr>
+        </tbody>
+      </table>
+
+      <h2 id="resume">POST /api/generate</h2>
+      <p>Tailor a resume and generate a cover letter for a specific job description.</p>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>resume</td><td>string</td><td><strong style="color:#6ee7b7">Yes</strong></td><td>Candidate's current resume text</td></tr>
+          <tr><td>jobDesc</td><td>string</td><td><strong style="color:#6ee7b7">Yes</strong></td><td>Full job description</td></tr>
+          <tr><td>name</td><td>string</td><td>No</td><td>Candidate name for cover letter</td></tr>
+          <tr><td>role</td><td>string</td><td>No</td><td>Role title for cover letter</td></tr>
+          <tr><td>tone</td><td>string</td><td>No</td><td>professional | confident | enthusiastic | concise</td></tr>
+          <tr><td>outputType</td><td>string</td><td>No</td><td>both | resume | cover (default: both)</td></tr>
+        </tbody>
+      </table>
+      <div class="code-block">
+        <div class="tab-btns">
+          <button class="tab-btn active" onclick="switchTab(this,'curl-resume')">curl</button>
+          <button class="tab-btn" onclick="switchTab(this,'js-resume')">JavaScript</button>
+          <button class="tab-btn" onclick="switchTab(this,'py-resume')">Python</button>
+        </div>
+        <div class="code-panel active" id="curl-resume"><pre><code>curl -X POST https://resume-tool.vercel.app/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "resume": "John Doe\nSoftware Engineer...",
+    "jobDesc": "We are looking for a Senior Engineer...",
+    "tone": "professional",
+    "outputType": "both"
+  }'</code></pre></div>
+        <div class="code-panel" id="js-resume"><pre><code>const res = await fetch('https://resume-tool.vercel.app/api/generate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    resume: 'John Doe\nSoftware Engineer...',
+    jobDesc: 'We are looking for a Senior Engineer...',
+    tone: 'professional',
+    outputType: 'both'
+  })
+});
+const { resume, coverLetter } = await res.json();</code></pre></div>
+        <div class="code-panel" id="py-resume"><pre><code>import requests
+r = requests.post('https://resume-tool.vercel.app/api/generate', json={
+    'resume': 'John Doe\nSoftware Engineer...',
+    'jobDesc': 'We are looking for a Senior Engineer...',
+    'tone': 'professional',
+    'outputType': 'both'
+})
+data = r.json()
+print(data['resume'], data['coverLetter'])</code></pre></div>
+      </div>
+
+      <h2 id="seo">POST /api/seo</h2>
+      <p>Generate a full SEO-optimized blog article from a keyword.</p>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>keyword</td><td>string</td><td><strong style="color:#6ee7b7">Yes</strong></td><td>Primary target keyword</td></tr>
+          <tr><td>secondary</td><td>string</td><td>No</td><td>Comma-separated secondary keywords</td></tr>
+          <tr><td>length</td><td>string</td><td>No</td><td>short | medium | long</td></tr>
+          <tr><td>audience</td><td>string</td><td>No</td><td>Target audience description</td></tr>
+          <tr><td>purpose</td><td>string</td><td>No</td><td>informational | commercial | transactional</td></tr>
+          <tr><td>tone</td><td>string</td><td>No</td><td>casual | professional | expert</td></tr>
+        </tbody>
+      </table>
+
+      <h2 id="adcopy">POST /api/ad-copy</h2>
+      <p>Generate 10 A/B ad copy variations for any platform.</p>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>productName</td><td>string</td><td><strong style="color:#6ee7b7">Yes</strong></td><td>Product or service name</td></tr>
+          <tr><td>audience</td><td>string</td><td>No</td><td>Target audience description</td></tr>
+          <tr><td>benefit</td><td>string</td><td>No</td><td>Main benefit or hook</td></tr>
+          <tr><td>platform</td><td>string</td><td>No</td><td>facebook | google | instagram | linkedin | tiktok</td></tr>
+          <tr><td>goal</td><td>string</td><td>No</td><td>awareness | clicks | conversions | installs</td></tr>
+        </tbody>
+      </table>
+
+      <h2 id="leads">POST /api/leads</h2>
+      <p>Score and qualify leads with ICP match percentages and outreach templates.</p>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>leads</td><td>array</td><td><strong style="color:#6ee7b7">Yes</strong></td><td>Array of lead objects: {name, industry, size, budget, timeline, painPoints}</td></tr>
+        </tbody>
+      </table>
+
+      <h2 id="meeting">POST /api/meeting</h2>
+      <p>Summarize meeting transcripts into action items, decisions, and next steps.</p>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>transcript</td><td>string</td><td><strong style="color:#6ee7b7">Yes</strong></td><td>Full meeting transcript or notes</td></tr>
+          <tr><td>title</td><td>string</td><td>No</td><td>Meeting title</td></tr>
+          <tr><td>attendees</td><td>string</td><td>No</td><td>Comma-separated attendee names</td></tr>
+          <tr><td>meetingType</td><td>string</td><td>No</td><td>team | standup | sales | client | board | retrospective</td></tr>
+        </tbody>
+      </table>
+      <p>Returns: <code>{ summary, actionItems, decisions, questions, nextSteps, score }</code></p>
+
+      <p style="margin-top:32px;">All other endpoints follow the same pattern — see each tool's page for its specific request/response schema.</p>
+    </main>
+  </div>
+
+  <footer>
+    <p>AI Tools API · <a href="/" style="color:var(--accent);text-decoration:none;">Back to Tools</a> · <a href="https://payhip.com/b/gFaqD" style="color:var(--accent);text-decoration:none;" target="_blank">Get API Key</a></p>
+  </footer>
+
+  <script>
+    function switchTab(btn, panelId) {
+      const block = btn.closest('.code-block');
+      block.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      block.querySelectorAll('.code-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(panelId).classList.add('active');
+    }
+  </script>
+</body>
+</html>

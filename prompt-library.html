@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Library — 30+ Free AI Prompts for Claude & ChatGPT</title>
+  <meta name="description" content="Free curated library of 30+ high-quality AI prompts for business, marketing, coding, writing, sales, productivity, and SEO. Copy and use instantly.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --border: #1f2937;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --green: #10b981;
+      --red: #ef4444;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+
+    /* Nav */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 14px; text-decoration: none; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { background: var(--accent); color: white !important; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-decoration: none; transition: background .2s; }
+    .nav-cta:hover { background: #4f46e5 !important; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 64px 20px 48px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 54px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 560px; margin: 0 auto 32px; line-height: 1.6; }
+
+    /* Stats */
+    .stats { display: flex; justify-content: center; gap: 60px; padding: 28px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin: 0 40px 48px; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 800; color: var(--accent); }
+    .stat-label { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    /* Controls */
+    .controls { max-width: 1100px; margin: 0 auto 32px; padding: 0 24px; }
+    .search-wrap { position: relative; margin-bottom: 20px; }
+    .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    #searchInput { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 15px; padding: 12px 14px 12px 44px; outline: none; transition: border-color .15s; font-family: inherit; }
+    #searchInput:focus { border-color: var(--accent); }
+    #searchInput::placeholder { color: var(--muted); }
+
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; }
+    .filter-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted); padding: 7px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .15s; white-space: nowrap; }
+    .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+    /* Grid */
+    .grid { max-width: 1100px; margin: 0 auto; padding: 0 24px 80px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+    /* Card */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px; display: flex; flex-direction: column; gap: 14px; transition: border-color .2s, transform .2s; }
+    .card:hover { border-color: rgba(99,102,241,.4); transform: translateY(-2px); }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .card-title { font-size: 15px; font-weight: 700; line-height: 1.3; }
+    .cat-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 3px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+    .cat-business  { background: rgba(99,102,241,.15); color: #a5b4fc; }
+    .cat-marketing { background: rgba(236,72,153,.15); color: #f9a8d4; }
+    .cat-coding    { background: rgba(16,185,129,.15); color: #6ee7b7; }
+    .cat-writing   { background: rgba(245,158,11,.15); color: #fcd34d; }
+    .cat-sales     { background: rgba(239,68,68,.15); color: #fca5a5; }
+    .cat-productivity { background: rgba(14,165,233,.15); color: #7dd3fc; }
+    .cat-seo       { background: rgba(139,92,246,.15); color: #c4b5fd; }
+
+    .use-case { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .prompt-box { background: #0d1425; border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; font-size: 12px; font-family: "SF Mono", "Fira Code", monospace; color: #cbd5e1; line-height: 1.6; max-height: 140px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
+    .prompt-box::-webkit-scrollbar { width: 4px; }
+    .prompt-box::-webkit-scrollbar-track { background: transparent; }
+    .prompt-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .var { color: #a78bfa; font-weight: 600; }
+
+    .card-actions { display: flex; gap: 10px; margin-top: auto; }
+    .btn-copy { flex: 1; background: var(--accent); color: white; border: none; border-radius: 8px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background .2s; }
+    .btn-copy:hover { background: #4f46e5; }
+    .btn-copy.copied { background: var(--green); }
+    .btn-try { background: transparent; color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; padding: 9px 14px; font-size: 13px; font-weight: 600; cursor: pointer; text-decoration: none; transition: all .2s; display: inline-flex; align-items: center; gap: 5px; }
+    .btn-try:hover { background: rgba(99,102,241,.1); }
+
+    /* No results */
+    .no-results { grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--muted); }
+    .no-results h3 { font-size: 18px; margin-bottom: 8px; color: var(--text); }
+
+    /* Pro CTA */
+    .pro-cta { max-width: 760px; margin: 0 auto 80px; padding: 0 24px; }
+    .pro-card { background: linear-gradient(135deg, rgba(99,102,241,.12), rgba(139,92,246,.12)); border: 1px solid rgba(99,102,241,.3); border-radius: 18px; padding: 40px; text-align: center; position: relative; overflow: hidden; }
+    .pro-card::before { content: ''; position: absolute; top: -60px; right: -60px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(99,102,241,.15) 0%, transparent 70%); pointer-events: none; }
+    .pro-badge { display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 20px; }
+    .pro-card h2 { font-size: clamp(22px, 4vw, 34px); font-weight: 900; margin-bottom: 12px; }
+    .pro-card h2 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .pro-card p { color: var(--muted); font-size: 16px; max-width: 480px; margin: 0 auto 28px; line-height: 1.6; }
+    .pro-features { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-bottom: 32px; }
+    .pro-feat { background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px; font-size: 13px; color: var(--text); }
+    .pro-feat::before { content: '✓ '; color: var(--green); font-weight: 700; }
+    .pro-price { margin-bottom: 20px; }
+    .pro-price .amount { font-size: 42px; font-weight: 900; color: var(--text); }
+    .pro-price .period { color: var(--muted); font-size: 15px; }
+    .pro-price .original { color: var(--muted); text-decoration: line-through; font-size: 18px; margin-right: 8px; }
+    .btn-pro { display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; text-decoration: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; transition: opacity .2s, transform .2s; }
+    .btn-pro:hover { opacity: .9; transform: translateY(-1px); }
+    .pro-note { margin-top: 12px; font-size: 12px; color: var(--muted); }
+
+    /* Submit Section */
+    .submit-section { max-width: 640px; margin: 0 auto 80px; padding: 0 24px; }
+    .submit-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; padding: 36px; }
+    .submit-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .submit-card p { color: var(--muted); font-size: 14px; margin-bottom: 28px; line-height: 1.6; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .form-group label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      background: #0d1425; border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-size: 14px; padding: 10px 14px; outline: none;
+      transition: border-color .15s; font-family: inherit; resize: vertical;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
+    .form-group input::placeholder, .form-group textarea::placeholder { color: var(--muted); }
+    .form-group select option { background: var(--surface); }
+    .btn-submit { background: var(--accent); color: white; border: none; border-radius: 8px; padding: 12px 28px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; transition: background .2s; margin-top: 8px; }
+    .btn-submit:hover { background: #4f46e5; }
+    .thank-you { display: none; text-align: center; padding: 32px 0; }
+    .thank-you .icon { font-size: 48px; margin-bottom: 16px; }
+    .thank-you h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .thank-you p { color: var(--muted); font-size: 14px; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); padding: 28px 40px; text-align: center; color: var(--muted); font-size: 13px; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .nav-links { gap: 12px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .stats { margin: 0 20px 36px; gap: 32px; }
+      .grid { grid-template-columns: 1fr; }
+      .pro-card { padding: 28px 20px; }
+      footer { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">PromptAI</a>
+  <div class="nav-links">
+    <a href="/tools">All Tools</a>
+    <a href="/prompt-library">Prompt Library</a>
+    <a href="https://payhip.com/b/gFaqD" target="_blank" class="nav-cta">Get Pro Pack →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="badge">Free Prompt Library</div>
+  <h1>Copy-Paste Prompts That<br><span>Actually Work</span></h1>
+  <p>30+ battle-tested prompts for Claude & ChatGPT — organized by category, ready to use. No signup required.</p>
+</section>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num">35+</div><div class="stat-label">Free Prompts</div></div>
+  <div class="stat"><div class="stat-num">7</div><div class="stat-label">Categories</div></div>
+  <div class="stat"><div class="stat-num">100+</div><div class="stat-label">Pro Pack Prompts</div></div>
+  <div class="stat"><div class="stat-num">$0</div><div class="stat-label">Cost to Copy</div></div>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchInput" placeholder="Search prompts…" oninput="filterPrompts()">
+  </div>
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-cat="all" onclick="setFilter('all')">All</button>
+    <button class="filter-btn" data-cat="Business" onclick="setFilter('Business')">Business</button>
+    <button class="filter-btn" data-cat="Marketing" onclick="setFilter('Marketing')">Marketing</button>
+    <button class="filter-btn" data-cat="Coding" onclick="setFilter('Coding')">Coding</button>
+    <button class="filter-btn" data-cat="Writing" onclick="setFilter('Writing')">Writing</button>
+    <button class="filter-btn" data-cat="Sales" onclick="setFilter('Sales')">Sales</button>
+    <button class="filter-btn" data-cat="Productivity" onclick="setFilter('Productivity')">Productivity</button>
+    <button class="filter-btn" data-cat="SEO" onclick="setFilter('SEO')">SEO</button>
+  </div>
+</div>
+
+<div class="grid" id="promptGrid"></div>
+
+<!-- Pro CTA -->
+<div class="pro-cta">
+  <div class="pro-card">
+    <div class="pro-badge">PRO PROMPT PACK</div>
+    <h2>Unlock <span>100+ Premium</span> Prompts</h2>
+    <p>Go beyond the free library. Get expert-level prompts for every business scenario — tested, refined, and ready to deploy.</p>
+    <div class="pro-features">
+      <div class="pro-feat">100+ Premium Prompts</div>
+      <div class="pro-feat">Advanced Variables</div>
+      <div class="pro-feat">Prompt Chaining Templates</div>
+      <div class="pro-feat">System Prompt Blueprints</div>
+      <div class="pro-feat">Lifetime Updates</div>
+      <div class="pro-feat">All 7 Categories</div>
+    </div>
+    <div class="pro-price">
+      <span class="original">$49</span>
+      <span class="amount">$19</span>
+      <span class="period"> one-time</span>
+    </div>
+    <a href="https://payhip.com/b/gFaqD" target="_blank" class="btn-pro">Get 100+ Prompts for $19 →</a>
+    <div class="pro-note">One-time payment · Instant download · 30-day money-back guarantee</div>
+  </div>
+</div>
+
+<!-- Submit Section -->
+<div class="submit-section">
+  <div class="submit-card">
+    <h2>Submit Your Prompt</h2>
+    <p>Have a great prompt that belongs in this library? Share it with the community. The best submissions get featured and you'll get a free Pro Pack copy.</p>
+    <div id="submitForm">
+      <div class="form-group">
+        <label>Your Name</label>
+        <input type="text" id="sName" placeholder="Jane Smith">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="sEmail" placeholder="jane@example.com">
+      </div>
+      <div class="form-group">
+        <label>Prompt Title</label>
+        <input type="text" id="sTitle" placeholder="e.g. Cold Email Generator">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="sCat">
+          <option value="">Select category…</option>
+          <option>Business</option>
+          <option>Marketing</option>
+          <option>Coding</option>
+          <option>Writing</option>
+          <option>Sales</option>
+          <option>Productivity</option>
+          <option>SEO</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>The Prompt</label>
+        <textarea id="sPrompt" rows="5" placeholder="Paste your prompt here. Use [VARIABLE] for dynamic parts."></textarea>
+      </div>
+      <button class="btn-submit" onclick="submitPrompt()">Submit Prompt</button>
+    </div>
+    <div class="thank-you" id="thankYou">
+      <div class="icon">🎉</div>
+      <h3>Thanks for contributing!</h3>
+      <p>We'll review your prompt and reach out within 2–3 days. Top submissions get featured in the library.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 PromptAI · <a href="/">Home</a> · <a href="/tools">Tools</a> · <a href="https://payhip.com/b/gFaqD" target="_blank">Pro Pack</a></p>
+</footer>
+
+<script>
+const PROMPTS = [
+  // ── BUSINESS ──
+  {
+    id: 1,
+    title: "Executive Summary Generator",
+    cat: "Business",
+    useCase: "Turn a long business plan or report into a crisp executive summary.",
+    prompt: `Write a concise executive summary for the following business document. The summary should be no more than 250 words and cover: the core problem, the proposed solution, target market, revenue model, and key metrics.
+
+Document:
+[PASTE YOUR DOCUMENT HERE]
+
+Audience: [TARGET AUDIENCE — e.g. investors, board members]
+Tone: [professional / formal / conversational]`,
+    tryLink: null
+  },
+  {
+    id: 2,
+    title: "SWOT Analysis Builder",
+    cat: "Business",
+    useCase: "Generate a structured SWOT analysis for any business, product, or strategy.",
+    prompt: `Perform a thorough SWOT analysis for [COMPANY/PRODUCT NAME] in the [INDUSTRY] industry.
+
+Context: [BRIEF DESCRIPTION — 2–3 sentences about the business]
+Competitors: [LIST 2–3 KEY COMPETITORS]
+
+Format the output as a clean table with Strengths, Weaknesses, Opportunities, and Threats. Then add a 100-word strategic recommendation paragraph.`,
+    tryLink: null
+  },
+  {
+    id: 3,
+    title: "Business Proposal Writer",
+    cat: "Business",
+    useCase: "Draft a professional business proposal that wins clients.",
+    prompt: `Write a business proposal for [SERVICE/PRODUCT] targeted at [CLIENT TYPE].
+
+Project scope: [DESCRIBE WHAT YOU'LL DELIVER]
+Budget range: [APPROXIMATE BUDGET]
+Timeline: [EXPECTED TIMELINE]
+Key differentiator: [WHY YOU / YOUR COMPANY]
+
+Include sections: Executive Summary, Problem Statement, Proposed Solution, Deliverables, Timeline, Pricing, and Next Steps. Use a confident, professional tone.`,
+    tryLink: null
+  },
+  {
+    id: 4,
+    title: "OKR Goal Framework",
+    cat: "Business",
+    useCase: "Set quarterly Objectives and Key Results for any team or department.",
+    prompt: `Create a set of OKRs (Objectives and Key Results) for the [QUARTER + YEAR] quarter for a [TEAM/DEPARTMENT] team at a [COMPANY TYPE] company.
+
+Company focus area: [MAIN STRATEGIC PRIORITY]
+Team size: [NUMBER] people
+Current challenge: [BIGGEST OBSTACLE]
+
+Write 2–3 Objectives, each with 3–4 measurable Key Results. Make each Key Result specific, time-bound, and quantifiable.`,
+    tryLink: null
+  },
+  {
+    id: 5,
+    title: "Investor Pitch Deck Outline",
+    cat: "Business",
+    useCase: "Structure a compelling 10-slide pitch deck narrative.",
+    prompt: `Create a detailed 10-slide investor pitch deck outline for [STARTUP NAME], a [ONE-LINE DESCRIPTION] company.
+
+Stage: [PRE-SEED / SEED / SERIES A]
+Raising: $[AMOUNT]
+Market: [TARGET MARKET]
+Traction: [KEY TRACTION METRICS]
+
+For each slide provide: slide title, 3–4 bullet points of content to include, and a note on what visual/chart would work best. Follow the Guy Kawasaki 10-slide structure.`,
+    tryLink: null
+  },
+
+  // ── MARKETING ──
+  {
+    id: 6,
+    title: "Brand Voice Guide Creator",
+    cat: "Marketing",
+    useCase: "Define your brand's tone, language, and personality in a reusable guide.",
+    prompt: `Create a brand voice and tone guide for [BRAND NAME], a [PRODUCT/SERVICE TYPE] brand targeting [TARGET AUDIENCE].
+
+Brand personality in 3 words: [WORD 1], [WORD 2], [WORD 3]
+Inspiration brands: [2–3 BRANDS YOU ADMIRE]
+What you're NOT: [WHAT TO AVOID]
+
+Include: Voice characteristics, tone for different channels (social, email, website, customer support), do/don't examples for each, and 5 sample taglines.`,
+    tryLink: "/ad-copy"
+  },
+  {
+    id: 7,
+    title: "Email Campaign Sequence",
+    cat: "Marketing",
+    useCase: "Write a 5-email nurture sequence for a product launch or lead magnet.",
+    prompt: `Write a 5-email nurture sequence for [PRODUCT/SERVICE NAME].
+
+Target audience: [DESCRIBE IDEAL CUSTOMER]
+Sequence trigger: [WHAT THEY SIGNED UP FOR — e.g. free guide, webinar]
+Goal: [DESIRED OUTCOME — e.g. book a call, make a purchase]
+Tone: [conversational / professional / friendly]
+
+For each email include: Subject line (+ A/B variant), preview text, body copy, and CTA. Emails should be sent on days 1, 2, 4, 7, and 10.`,
+    tryLink: "/email-sequences"
+  },
+  {
+    id: 8,
+    title: "Social Media Content Calendar",
+    cat: "Marketing",
+    useCase: "Generate a week of social content across platforms.",
+    prompt: `Create a 7-day social media content calendar for [BRAND/PRODUCT] in the [INDUSTRY] niche.
+
+Platforms: [LIST PLATFORMS — e.g. Instagram, LinkedIn, X]
+Content pillars: [3 THEMES YOU POST ABOUT]
+Upcoming event/launch: [ANY RELEVANT DATE]
+Audience: [WHO FOLLOWS YOU]
+
+For each day provide: Platform, post format (carousel/video/static/story), caption, hashtags, and a note on the visual concept. Include at least 2 engagement posts (polls, questions).`,
+    tryLink: "/social-media"
+  },
+  {
+    id: 9,
+    title: "YouTube Video Script",
+    cat: "Marketing",
+    useCase: "Write a structured, engaging YouTube video script with hooks.",
+    prompt: `Write a complete YouTube video script for a [LENGTH — e.g. 8-minute] video titled "[VIDEO TITLE]".
+
+Channel niche: [NICHE]
+Target viewer: [DESCRIBE VIEWER]
+Main takeaway: [ONE KEY THING VIEWERS LEARN]
+CTA: [WHAT YOU WANT VIEWERS TO DO]
+
+Structure: Hook (first 30 seconds to stop the scroll), Context, Main Content (3–5 sections), Recap, CTA. Include [B-ROLL] notes and natural spoken language — avoid sounding like an essay.`,
+    tryLink: null
+  },
+  {
+    id: 10,
+    title: "Landing Page Copy",
+    cat: "Marketing",
+    useCase: "Write high-converting landing page copy for any offer.",
+    prompt: `Write full landing page copy for [PRODUCT/SERVICE NAME].
+
+What it does: [ONE-SENTENCE DESCRIPTION]
+Target customer: [WHO THEY ARE + THEIR PAIN]
+Price: [PRICE POINT]
+Main benefit: [BIGGEST OUTCOME]
+Key features: [LIST 4–5 FEATURES]
+Social proof available: [TESTIMONIALS / NUMBERS]
+
+Include: Headline + subheadline, hero section, 3 benefit sections (problem → solution format), features list, testimonials block (write fictional placeholders), FAQ (5 questions), and closing CTA. Use direct-response copywriting principles.`,
+    tryLink: null
+  },
+
+  // ── CODING ──
+  {
+    id: 11,
+    title: "Code Review & Refactor",
+    cat: "Coding",
+    useCase: "Get a thorough code review with actionable refactoring suggestions.",
+    prompt: `Review the following [LANGUAGE] code and provide:
+1. A summary of what the code does
+2. Identified bugs or logic errors
+3. Performance issues
+4. Security vulnerabilities (if any)
+5. Readability/maintainability improvements
+6. A refactored version with inline comments explaining changes
+
+Code:
+\`\`\`[LANGUAGE]
+[PASTE CODE HERE]
+\`\`\`
+
+Context: This code is used for [PURPOSE]. Priority is [performance / readability / security].`,
+    tryLink: "/code-reviewer"
+  },
+  {
+    id: 12,
+    title: "API Endpoint Designer",
+    cat: "Coding",
+    useCase: "Design a RESTful API structure for any feature.",
+    prompt: `Design a RESTful API for [FEATURE/SYSTEM NAME].
+
+Tech stack: [BACKEND LANGUAGE + FRAMEWORK]
+Database: [DB TYPE]
+Auth method: [JWT / OAuth / API Key]
+User roles: [LIST ROLES]
+
+For each endpoint provide: Method, path, request body schema, response schema, status codes, and a brief description. Also suggest rate limiting rules and any middleware needed. Format as a clean API specification.`,
+    tryLink: null
+  },
+  {
+    id: 13,
+    title: "Debug This Error",
+    cat: "Coding",
+    useCase: "Diagnose and fix any error message with context-aware solutions.",
+    prompt: `I'm getting this error in my [LANGUAGE/FRAMEWORK] project:
+
+Error message:
+\`\`\`
+[PASTE ERROR HERE]
+\`\`\`
+
+Relevant code:
+\`\`\`[LANGUAGE]
+[PASTE CODE HERE]
+\`\`\`
+
+Environment: [OS, runtime version, relevant library versions]
+What I've tried: [STEPS ALREADY ATTEMPTED]
+
+Explain why this error occurs, then provide the fix with explanation. If multiple solutions exist, rank them and explain tradeoffs.`,
+    tryLink: null
+  },
+  {
+    id: 14,
+    title: "Unit Test Generator",
+    cat: "Coding",
+    useCase: "Automatically generate comprehensive unit tests for any function.",
+    prompt: `Write comprehensive unit tests for the following [LANGUAGE] function/class using [TESTING FRAMEWORK — e.g. Jest, pytest, JUnit].
+
+Code to test:
+\`\`\`[LANGUAGE]
+[PASTE CODE HERE]
+\`\`\`
+
+Requirements:
+- Happy path tests
+- Edge cases (empty input, null, boundary values)
+- Error/exception tests
+- Mock any external dependencies
+
+Add descriptive test names and group related tests in describe blocks. Aim for >90% coverage.`,
+    tryLink: null
+  },
+  {
+    id: 15,
+    title: "Database Schema Designer",
+    cat: "Coding",
+    useCase: "Design an optimized database schema for any application.",
+    prompt: `Design a normalized database schema for a [APP TYPE — e.g. SaaS project management tool].
+
+Key entities: [LIST MAIN OBJECTS — e.g. Users, Projects, Tasks, Comments]
+Scale expectation: [ESTIMATED ROWS / USERS]
+Database: [PostgreSQL / MySQL / MongoDB]
+Special requirements: [SOFT DELETES / MULTI-TENANCY / AUDIT LOGS]
+
+Provide: CREATE TABLE statements (or equivalent), indexes, foreign key relationships, an ER diagram in text format, and a brief explanation of key design decisions.`,
+    tryLink: null
+  },
+
+  // ── WRITING ──
+  {
+    id: 16,
+    title: "Blog Post Generator",
+    cat: "Writing",
+    useCase: "Write a full, SEO-structured blog post on any topic.",
+    prompt: `Write a comprehensive [WORD COUNT — e.g. 1,500-word] blog post on "[TOPIC]".
+
+Target audience: [WHO WILL READ THIS]
+Primary keyword: [MAIN KEYWORD]
+Secondary keywords: [2–3 RELATED KEYWORDS]
+Tone: [informative / conversational / authoritative]
+Goal: [educate / convert / rank]
+
+Structure: Engaging headline (include keyword), meta description (155 chars), intro with hook, 4–5 H2 sections with H3 subheadings where needed, a key takeaway box, and a conclusion with CTA. Include natural keyword placement throughout.`,
+    tryLink: "/seo-writer"
+  },
+  {
+    id: 17,
+    title: "LinkedIn Thought Leadership Post",
+    cat: "Writing",
+    useCase: "Write a viral-worthy LinkedIn post that builds authority.",
+    prompt: `Write a LinkedIn post that will get high engagement on the topic of [TOPIC].
+
+My background: [YOUR ROLE + INDUSTRY]
+Key insight/story: [THE MAIN POINT OR ANECDOTE]
+Target audience: [WHO YOU WANT TO REACH]
+Goal: [grow following / generate leads / build authority]
+
+Requirements:
+- Hook in first line (no "I" as first word)
+- Personal story or contrarian take
+- 3–5 short paragraphs with line breaks for readability
+- 3–5 questions to drive comments
+- 5 relevant hashtags
+
+Write 2 versions: one data-driven, one story-driven.`,
+    tryLink: null
+  },
+  {
+    id: 18,
+    title: "Case Study Writer",
+    cat: "Writing",
+    useCase: "Turn client results into a compelling case study.",
+    prompt: `Write a case study for [CLIENT/PROJECT NAME] in the [INDUSTRY] industry.
+
+Challenge: [THE PROBLEM THEY FACED]
+Solution: [WHAT YOU/YOUR PRODUCT DID]
+Results: [SPECIFIC METRICS — e.g. 40% increase in revenue, saved 10 hrs/week]
+Timeline: [HOW LONG IT TOOK]
+Quote available: [YES/NO — if yes, paste it]
+
+Format: Problem → Solution → Results structure. Include a stats callout box. Write in third person. Length: 600–800 words. End with a CTA to work with you.`,
+    tryLink: null
+  },
+  {
+    id: 19,
+    title: "Newsletter Issue Writer",
+    cat: "Writing",
+    useCase: "Write a complete newsletter issue that readers look forward to.",
+    prompt: `Write a newsletter issue for [NEWSLETTER NAME], sent to [AUDIENCE TYPE].
+
+Theme/topic this week: [MAIN TOPIC]
+Tone: [DESCRIBE YOUR NEWSLETTER VOICE]
+Sections to include: [e.g. Intro story, Main insight, 3 quick tips, Tool of the week, Question for readers]
+Word count target: [~500 / ~800 / ~1200 words]
+
+Make the intro hook personal and relatable. Avoid corporate speak. Each section should have a clear header. End with a P.S. line that teases next issue.`,
+    tryLink: "/newsletter-builder"
+  },
+  {
+    id: 20,
+    title: "Book Chapter Outline",
+    cat: "Writing",
+    useCase: "Structure a non-fiction book chapter with clear narrative flow.",
+    prompt: `Create a detailed chapter outline for Chapter [NUMBER]: "[CHAPTER TITLE]" of a non-fiction book about [BOOK TOPIC].
+
+Book audience: [TARGET READER]
+Chapter goal: [WHAT READERS WILL LEARN OR FEEL]
+Chapter length target: [~X words]
+Preceding chapter summary: [WHAT CAME BEFORE]
+
+Include: Opening hook concept, 4–6 main sections with subpoints, key stories/examples to include (suggest 2–3 types), exercises or reflection questions, and a chapter summary + bridge to next chapter.`,
+    tryLink: null
+  },
+
+  // ── SALES ──
+  {
+    id: 21,
+    title: "Cold Email Outreach",
+    cat: "Sales",
+    useCase: "Write personalized cold emails with high reply rates.",
+    prompt: `Write a cold outreach email to [PROSPECT ROLE] at [COMPANY TYPE] companies.
+
+My offer: [WHAT I SELL IN ONE LINE]
+Their pain: [SPECIFIC PROBLEM THEY HAVE]
+Social proof: [ONE RESULT / CASE STUDY]
+CTA: [WHAT I WANT THEM TO DO — e.g. 15-min call]
+
+Requirements:
+- Subject line under 50 characters (write 3 options)
+- Under 150 words total
+- One sentence of personalization placeholder [PERSONALIZATION]
+- No buzzwords like "synergy" or "leverage"
+- End with a soft, low-friction CTA
+
+Write 2 versions: one direct, one curiosity-driven.`,
+    tryLink: null
+  },
+  {
+    id: 22,
+    title: "Sales Call Script",
+    cat: "Sales",
+    useCase: "Structure a discovery-to-close sales call that converts.",
+    prompt: `Write a sales call script for selling [PRODUCT/SERVICE] to [TARGET CUSTOMER].
+
+Call type: [discovery / demo / closing]
+Call length: [20 / 30 / 45 minutes]
+Common objections: [LIST 2–3 OBJECTIONS YOU HEAR]
+Price point: [$AMOUNT]
+
+Include: Opening rapport section, discovery questions (5–7), transition to pitch, demo/presentation talking points, objection handling responses, trial close, and closing ask. Add [PAUSE] and [LISTEN] stage directions.`,
+    tryLink: null
+  },
+  {
+    id: 23,
+    title: "Proposal Follow-Up Sequence",
+    cat: "Sales",
+    useCase: "Write follow-up emails after sending a proposal — without being pushy.",
+    prompt: `Write a 4-email follow-up sequence to send after delivering a proposal for [SERVICE/PRODUCT].
+
+Prospect type: [DECISION MAKER ROLE]
+Proposal value: $[AMOUNT]
+Proposed timeline: [START DATE]
+Last interaction: [WHAT HAPPENED IN LAST MEETING]
+
+Emails: Day 2 (soft check-in), Day 5 (add value / address concern), Day 10 (create urgency), Day 14 (breakup email). Each email should be under 100 words, warm but professional. Include subject line for each.`,
+    tryLink: null
+  },
+  {
+    id: 24,
+    title: "Objection Handler",
+    cat: "Sales",
+    useCase: "Generate persuasive responses to the most common sales objections.",
+    prompt: `I sell [PRODUCT/SERVICE] priced at [PRICE]. Write professional, non-pushy responses to these objections:
+
+1. "It's too expensive"
+2. "We don't have budget right now"
+3. "We're happy with our current solution"
+4. "I need to think about it"
+5. [YOUR CUSTOM OBJECTION]
+
+For each objection: Acknowledge the concern (1 sentence), reframe or provide perspective (2 sentences), ask a clarifying question to continue the conversation. Tone: confident, empathetic, consultative.`,
+    tryLink: "/lead-qualifier"
+  },
+  {
+    id: 25,
+    title: "LinkedIn Connection Message",
+    cat: "Sales",
+    useCase: "Write LinkedIn connection requests that get accepted and start conversations.",
+    prompt: `Write 5 LinkedIn connection request messages to send to [TARGET ROLE] in the [INDUSTRY] industry.
+
+My role: [YOUR TITLE]
+Reason for connecting: [1–2 GENUINE REASONS]
+Mutual ground: [SHARED GROUP / INTEREST / CONNECTION]
+Goal: [START CONVERSATION / OFFER VALUE / EXPLORE FIT]
+
+Requirements: Under 300 characters each, no pitch in the connection request, personalize with [THEIR NAME] placeholder, feel genuinely human. Vary the angle across the 5 versions.`,
+    tryLink: null
+  },
+
+  // ── PRODUCTIVITY ──
+  {
+    id: 26,
+    title: "Weekly Planning Assistant",
+    cat: "Productivity",
+    useCase: "Plan your week strategically with clear priorities and time blocks.",
+    prompt: `Help me plan my week as a [ROLE] at a [COMPANY TYPE].
+
+My top 3 goals this week:
+1. [GOAL 1]
+2. [GOAL 2]
+3. [GOAL 3]
+
+My scheduled commitments: [LIST MEETINGS / FIXED EVENTS]
+Energy pattern: [WHEN ARE YOU MOST FOCUSED — morning/afternoon]
+Biggest distraction: [WHAT DERAILS YOU]
+
+Create a day-by-day time-blocked schedule (Mon–Fri), identify my single "Most Important Task" per day, suggest a morning routine, and flag any potential scheduling conflicts.`,
+    tryLink: null
+  },
+  {
+    id: 27,
+    title: "Meeting Summarizer",
+    cat: "Productivity",
+    useCase: "Transform raw meeting notes or transcripts into structured summaries.",
+    prompt: `Summarize the following meeting notes/transcript into a clean, actionable document.
+
+Meeting type: [STANDUP / CLIENT CALL / STRATEGY / BRAINSTORM]
+Attendees: [LIST NAMES + ROLES]
+Date: [DATE]
+
+Raw notes:
+[PASTE NOTES OR TRANSCRIPT HERE]
+
+Output format:
+- TL;DR (2 sentences)
+- Key decisions made
+- Action items (owner + due date)
+- Open questions / parking lot
+- Next meeting agenda suggestions`,
+    tryLink: "/meeting-summarizer"
+  },
+  {
+    id: 28,
+    title: "SOP Document Writer",
+    cat: "Productivity",
+    useCase: "Turn a process you know into a clear, repeatable SOP anyone can follow.",
+    prompt: `Write a Standard Operating Procedure (SOP) for the process of [PROCESS NAME] at [COMPANY TYPE].
+
+Who performs this: [ROLE]
+Frequency: [HOW OFTEN — daily / weekly / as-needed]
+Tools required: [LIST TOOLS / SYSTEMS USED]
+Current pain points: [WHAT GOES WRONG WITHOUT AN SOP]
+
+Include: Purpose, Scope, Prerequisites, Step-by-step instructions (numbered, with decision points), Troubleshooting section (3 common issues + fixes), and a Revision history table. Use simple, active voice language.`,
+    tryLink: null
+  },
+  {
+    id: 29,
+    title: "Performance Review Writer",
+    cat: "Productivity",
+    useCase: "Write a thoughtful, evidence-based self-performance review.",
+    prompt: `Write my self-performance review for [REVIEW PERIOD — e.g. Q2 2025].
+
+My role: [JOB TITLE]
+Top accomplishments: [LIST 3–5 ACHIEVEMENTS WITH METRICS]
+Challenges faced: [1–2 HONEST CHALLENGES]
+Skills improved: [WHAT YOU LEARNED OR DEVELOPED]
+Goals for next period: [2–3 GOALS]
+
+Write in first person. Be specific and results-oriented. For each accomplishment use the STAR format (Situation, Task, Action, Result). Length: 400–600 words. Tone: confident but not arrogant.`,
+    tryLink: null
+  },
+  {
+    id: 30,
+    title: "Delegation Brief",
+    cat: "Productivity",
+    useCase: "Hand off a task clearly so your team executes it without endless back-and-forth.",
+    prompt: `Write a delegation brief for the task: [TASK NAME].
+
+Delegating to: [TEAM MEMBER ROLE]
+Due date: [DEADLINE]
+Priority level: [HIGH / MEDIUM / LOW]
+Background context: [WHY THIS TASK EXISTS]
+Definition of done: [WHAT DONE LOOKS LIKE]
+Resources available: [LINKS, DOCS, TOOLS]
+Key constraints: [BUDGET / BRAND GUIDELINES / TECHNICAL LIMITS]
+
+Format as a concise brief they can reference without follow-up questions. Include a "Questions to ask before starting" section.`,
+    tryLink: null
+  },
+
+  // ── SEO ──
+  {
+    id: 31,
+    title: "Keyword Cluster Builder",
+    cat: "SEO",
+    useCase: "Organize keywords into topical clusters for a content strategy.",
+    prompt: `Create a keyword cluster strategy for a website about [TOPIC/NICHE].
+
+Seed keyword: [PRIMARY KEYWORD]
+Audience: [TARGET READER]
+Domain authority level: [LOW <30 / MEDIUM 30-60 / HIGH 60+]
+Content goal: [RANK FOR INFORMATIONAL / COMMERCIAL / TRANSACTIONAL KEYWORDS]
+
+Provide: 1 pillar page topic, 8–10 cluster page topics, semantic keywords for each cluster, suggested internal linking structure, and estimated search intent (informational/commercial/navigational/transactional) for each page.`,
+    tryLink: "/seo-writer"
+  },
+  {
+    id: 32,
+    title: "Meta Title & Description Optimizer",
+    cat: "SEO",
+    useCase: "Write click-worthy meta titles and descriptions for any page.",
+    prompt: `Write optimized meta titles and descriptions for the following web pages.
+
+Website type: [ECOMMERCE / BLOG / SAAS / LOCAL BUSINESS]
+Primary keyword for each page:
+
+Page 1: [PAGE NAME] — Keyword: [KEYWORD]
+Page 2: [PAGE NAME] — Keyword: [KEYWORD]
+Page 3: [PAGE NAME] — Keyword: [KEYWORD]
+
+Requirements:
+- Title: 50–60 characters, keyword near the front
+- Description: 140–155 characters, includes CTA
+- Write 2 variants per page (one emotional, one benefit-driven)
+- Avoid keyword stuffing`,
+    tryLink: null
+  },
+  {
+    id: 33,
+    title: "FAQ Schema Content Generator",
+    cat: "SEO",
+    useCase: "Generate FAQ content optimized for featured snippets and FAQ schema.",
+    prompt: `Generate 10 FAQ questions and answers for the topic: [TOPIC].
+
+Target keyword: [PRIMARY KEYWORD]
+Page type: [PRODUCT PAGE / BLOG POST / SERVICE PAGE]
+Audience knowledge level: [BEGINNER / INTERMEDIATE / EXPERT]
+
+Requirements:
+- Questions should match real search queries (how, what, why, can I, is it)
+- Answers: 40–60 words each, direct and factual
+- Include the primary keyword naturally in 3–4 answers
+- Format ready to paste as FAQ schema markup (Question + Answer pairs)`,
+    tryLink: null
+  },
+  {
+    id: 34,
+    title: "Link Building Outreach Email",
+    cat: "SEO",
+    useCase: "Write outreach emails for link building that actually get responses.",
+    prompt: `Write a link building outreach email to request a backlink from [TARGET SITE TYPE] websites.
+
+My site: [YOUR SITE NAME + NICHE]
+My content to link to: [PAGE TITLE + URL]
+Why they should link: [VALUE / RELEVANCE TO THEIR AUDIENCE]
+What I can offer: [RECIPROCAL VALUE — e.g. social share, resource mention]
+
+Write 3 email versions: Resource page outreach, Broken link replacement, and Guest post pitch. Each under 120 words. Subject line included. Personalization placeholder: [FIRST NAME], [THEIR RECENT ARTICLE].`,
+    tryLink: null
+  },
+  {
+    id: 35,
+    title: "Product Description for E-commerce",
+    cat: "SEO",
+    useCase: "Write SEO-optimized product descriptions that rank and convert.",
+    prompt: `Write an SEO-optimized product description for [PRODUCT NAME].
+
+Category: [PRODUCT CATEGORY]
+Primary keyword: [KEYWORD]
+Target buyer: [DESCRIBE IDEAL CUSTOMER]
+Key features: [LIST 4–5 FEATURES]
+Key benefits (outcomes): [LIST 3–4 BENEFITS]
+Differentiator: [WHAT MAKES IT UNIQUE]
+
+Write: A 60-word short description (for category pages), a 200-word full description (for product page), 5 bullet points with feature + benefit format, and a 155-character meta description. Include primary keyword in first 100 words naturally.`,
+    tryLink: "/product-descriptions"
+  }
+];
+
+let activeFilter = 'all';
+
+function catClass(cat) {
+  return 'cat-' + cat.toLowerCase().replace(/\s+/g, '');
+}
+
+function highlightVars(text) {
+  return text.replace(/\[([^\]]+)\]/g, '<span class="var">[$1]</span>');
+}
+
+function renderCards(list) {
+  const grid = document.getElementById('promptGrid');
+  if (!list.length) {
+    grid.innerHTML = '<div class="no-results"><h3>No prompts found</h3><p>Try a different search term or category.</p></div>';
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <div class="card" data-id="${p.id}">
+      <div class="card-top">
+        <div class="card-title">${p.title}</div>
+        <span class="cat-badge ${catClass(p.cat)}">${p.cat}</span>
+      </div>
+      <div class="use-case">${p.useCase}</div>
+      <div class="prompt-box" id="pb-${p.id}">${highlightVars(p.prompt)}</div>
+      <div class="card-actions">
+        <button class="btn-copy" id="btn-${p.id}" onclick="copyPrompt(${p.id})">Copy Prompt</button>
+        ${p.tryLink ? `<a href="${p.tryLink}" class="btn-try">Try in Tool →</a>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterPrompts() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = PROMPTS;
+  if (activeFilter !== 'all') list = list.filter(p => p.cat === activeFilter);
+  if (q) list = list.filter(p =>
+    p.title.toLowerCase().includes(q) ||
+    p.useCase.toLowerCase().includes(q) ||
+    p.prompt.toLowerCase().includes(q) ||
+    p.cat.toLowerCase().includes(q)
+  );
+  renderCards(list);
+}
+
+function setFilter(cat) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  filterPrompts();
+}
+
+function copyPrompt(id) {
+  const p = PROMPTS.find(x => x.id === id);
+  if (!p) return;
+  navigator.clipboard.writeText(p.prompt).then(() => {
+    const btn = document.getElementById('btn-' + id);
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy Prompt'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function submitPrompt() {
+  const name = document.getElementById('sName').value.trim();
+  const email = document.getElementById('sEmail').value.trim();
+  const title = document.getElementById('sTitle').value.trim();
+  const cat = document.getElementById('sCat').value;
+  const prompt = document.getElementById('sPrompt').value.trim();
+  if (!name || !email || !title || !cat || !prompt) {
+    alert('Please fill in all fields before submitting.');
+    return;
+  }
+  document.getElementById('submitForm').style.display = 'none';
+  document.getElementById('thankYou').style.display = 'block';
+}
+
+// Init
+renderCards(PROMPTS);
+</script>
+</body>
+</html>

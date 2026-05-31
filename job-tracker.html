@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Application Tracker & Auto-Fill Assistant — ResumeAI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --border: #1f2937;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --gold: #d97706;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+
+    /* Nav */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 24px; align-items: center; }
+    .nav-link { color: var(--muted); font-size: 14px; text-decoration: none; transition: color .15s; }
+    .nav-link:hover { color: var(--text); }
+    .nav-cta { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-decoration: none; transition: background .2s; }
+    .nav-cta:hover { background: #4f46e5; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 64px 20px 44px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 24px; letter-spacing: .3px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+
+    /* Main Tabs */
+    .main-tabs-wrap { max-width: 1060px; margin: 40px auto 0; padding: 0 20px; }
+    .main-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); }
+    .main-tab { padding: 12px 24px; cursor: pointer; font-size: 15px; font-weight: 700; color: var(--muted); border-bottom: 2px solid transparent; transition: color .15s; user-select: none; }
+    .main-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .main-tab-content { display: none; }
+    .main-tab-content.active { display: block; }
+
+    /* ===== TRACKER ===== */
+    .tracker-wrap { max-width: 1060px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; text-align: center; }
+    .stat-card .num { font-size: 28px; font-weight: 900; color: var(--accent); }
+    .stat-card .lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* Add Job form */
+    .add-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px 28px; margin-bottom: 28px; }
+    .add-card h2 { font-size: 17px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    input, select, textarea {
+      background: #0d1425;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color .15s;
+      font-family: inherit;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    select option { background: #111827; }
+    textarea { resize: vertical; }
+    .add-bar { display: flex; gap: 12px; align-items: center; margin-top: 20px; flex-wrap: wrap; }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 12px 28px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-primary:hover { opacity: .88; }
+    .btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 11px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: border-color .15s, color .15s; }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* View toggle */
+    .view-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .view-bar h3 { font-size: 16px; font-weight: 700; }
+    .view-toggle { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .view-btn { padding: 7px 16px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--muted); border: none; background: none; transition: color .15s, background .15s; }
+    .view-btn.active { background: var(--accent); color: white; }
+
+    /* Kanban */
+    .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .kanban-col { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-height: 160px; }
+    .kanban-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .kanban-col-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .kanban-count { background: #0d1425; border: 1px solid var(--border); border-radius: 12px; padding: 2px 8px; font-size: 12px; color: var(--muted); }
+    .kanban-cards { display: flex; flex-direction: column; gap: 10px; }
+
+    /* Job card */
+    .job-card { background: #0d1425; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; transition: border-color .15s; cursor: default; }
+    .job-card:hover { border-color: var(--accent); }
+    .job-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .job-company { font-size: 14px; font-weight: 700; }
+    .job-role { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+    .job-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .job-date { font-size: 11px; color: var(--muted); }
+    .job-url { font-size: 11px; color: var(--accent); text-decoration: none; }
+    .job-url:hover { text-decoration: underline; }
+    .job-notes { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 8px; }
+    .job-actions { display: flex; gap: 6px; margin-top: 10px; }
+    .btn-del { background: none; border: 1px solid var(--border); color: var(--muted); padding: 3px 10px; border-radius: 5px; font-size: 11px; cursor: pointer; transition: border-color .15s, color .15s; }
+    .btn-del:hover { border-color: var(--red); color: var(--red); }
+
+    /* Status chips */
+    .chip { display: inline-block; padding: 2px 9px; border-radius: 5px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; }
+    .chip-Applied    { background: rgba(99,102,241,.15); color: #a5b4fc; }
+    .chip-PhoneScreen{ background: rgba(245,158,11,.12); color: #fbbf24; }
+    .chip-Interview  { background: rgba(16,185,129,.15); color: #34d399; }
+    .chip-Offer      { background: rgba(217,119,6,.15);  color: #fbbf24; border: 1px solid rgba(217,119,6,.4); }
+    .chip-Rejected   { background: rgba(239,68,68,.12); color: #f87171; }
+    .chip-Ghosted    { background: rgba(100,116,139,.1); color: #94a3b8; }
+
+    /* List view */
+    .list-table-wrap { overflow-x: auto; }
+    .list-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .list-table th { background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    .list-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: #cbd5e1; vertical-align: top; }
+    .list-table tr:last-child td { border-bottom: none; }
+    .list-table tr:hover td { background: rgba(99,102,241,.04); }
+
+    /* Empty */
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); font-size: 15px; }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+    /* ===== AUTO-FILL ===== */
+    .autofill-wrap { max-width: 800px; margin: 0 auto; padding: 32px 20px 80px; }
+    .autofill-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; margin-bottom: 24px; }
+    .autofill-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .autofill-card > p { color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.6; }
+    .char-count { font-size: 11px; color: var(--muted); text-align: right; margin-top: 4px; }
+
+    /* Paywall */
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); border: 1px solid rgba(99,102,241,.25); border-radius: 16px; padding: 36px 32px; margin-bottom: 24px; }
+    .paywall h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+    .paywall > p { color: var(--muted); margin-bottom: 24px; font-size: 14px; line-height: 1.5; }
+    .price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
+    .price-tag { font-size: 36px; font-weight: 900; color: var(--accent); }
+    .price-per { color: var(--muted); font-size: 14px; }
+    .price-old { font-size: 18px; color: var(--muted); text-decoration: line-through; }
+    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 28px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+    .btn-pay:hover { opacity: .88; }
+    .paywall-features { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+    .paywall-feature { display: flex; gap: 8px; font-size: 14px; color: var(--muted); }
+    .paywall-feature span:first-child { color: var(--green); flex-shrink: 0; }
+    .paywall-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0 20px; color: var(--muted); font-size: 12px; }
+    .paywall-divider::before, .paywall-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    .code-row { display: flex; gap: 10px; }
+    .code-input { flex: 1; background: #0d1425; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .15s; font-family: inherit; }
+    .code-input:focus { border-color: var(--accent); }
+    .btn-unlock { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 11px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 700; transition: border-color .15s, color .15s; white-space: nowrap; }
+    .btn-unlock:hover { border-color: var(--accent); color: var(--accent); }
+    .code-hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+    /* Answers */
+    .answers-section { display: none; }
+    .answers-section.visible { display: block; }
+    .answer-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 14px; }
+    .answer-q { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 10px; text-transform: uppercase; letter-spacing: .3px; }
+    .answer-text { font-size: 14px; color: #cbd5e1; line-height: 1.75; background: #0d1425; border: 1px solid var(--border); border-radius: 8px; padding: 16px; margin-bottom: 10px; white-space: pre-wrap; }
+    .btn-copy { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 7px 16px; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s, color .15s; }
+    .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-copy.copied { border-color: var(--green); color: var(--green); }
+
+    /* Loader */
+    .loader { display: none; align-items: center; gap: 14px; color: var(--muted); font-size: 14px; padding: 20px 0; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error */
+    .error-box { padding: 12px 16px; background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; color: #fca5a5; font-size: 14px; display: none; margin-top: 12px; }
+    .error-box.visible { display: block; }
+
+    /* Features */
+    .features { max-width: 1060px; margin: 0 auto 80px; padding: 0 20px; }
+    .features h2 { text-align: center; font-size: 26px; font-weight: 800; margin-bottom: 32px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+    .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px 18px; }
+    .feature-icon { font-size: 26px; margin-bottom: 10px; }
+    .feature-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .feature-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* Footer */
+    footer { border-top: 1px solid var(--border); padding: 28px 40px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .footer-copy { color: var(--muted); font-size: 13px; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { color: var(--muted); font-size: 13px; text-decoration: none; }
+    .footer-links a:hover { color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { gap: 14px; }
+      .nav-link { display: none; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .kanban { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .list-table th:nth-child(4), .list-table td:nth-child(4) { display: none; }
+      footer { padding: 24px 20px; }
+    }
+    @media (max-width: 480px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .main-tab { padding: 10px 14px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">ResumeAI</a>
+  <div class="nav-links">
+    <a class="nav-link" href="/">Resume</a>
+    <a class="nav-link" href="/meeting-summarizer.html">Meetings</a>
+    <a class="nav-link" href="/job-tracker.html" style="color:var(--text);">Job Tracker</a>
+    <a class="nav-cta" href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">Get Unlimited</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge">&#x1F4CB; Job Application Tracker</div>
+  <h1>Track Every Application.<br><span>Nail Every Answer.</span></h1>
+  <p>Free kanban tracker for your job search. Unlock AI-generated application answers tailored to any job description.</p>
+</div>
+
+<!-- Main Tabs -->
+<div class="main-tabs-wrap">
+  <div class="main-tabs">
+    <div class="main-tab active" data-tab="tracker">&#x1F4CC; Track Applications</div>
+    <div class="main-tab" data-tab="autofill">&#x2728; Auto-Fill Helper</div>
+  </div>
+</div>
+
+<!-- ===== TRACKER TAB ===== -->
+<div class="main-tab-content active" id="tab-tracker">
+  <div class="tracker-wrap">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="num" id="stat-total">0</div><div class="lbl">Total Applications</div></div>
+      <div class="stat-card"><div class="num" id="stat-interviews">0</div><div class="lbl">Interviews</div></div>
+      <div class="stat-card"><div class="num" id="stat-offers">0</div><div class="lbl">Offers</div></div>
+      <div class="stat-card"><div class="num" id="stat-rate">0%</div><div class="lbl">Response Rate</div></div>
+    </div>
+
+    <!-- Add Job Form -->
+    <div class="add-card">
+      <h2>&#x2795; Add Application</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Company</label>
+          <input type="text" id="add-company" placeholder="e.g. Stripe" maxlength="120">
+        </div>
+        <div class="form-group">
+          <label>Role / Title</label>
+          <input type="text" id="add-role" placeholder="e.g. Senior Product Designer" maxlength="120">
+        </div>
+        <div class="form-group">
+          <label>Job URL</label>
+          <input type="url" id="add-url" placeholder="https://..." maxlength="500">
+        </div>
+        <div class="form-group">
+          <label>Date Applied</label>
+          <input type="date" id="add-date">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="add-status">
+            <option value="Applied">Applied</option>
+            <option value="PhoneScreen">Phone Screen</option>
+            <option value="Interview">Interview</option>
+            <option value="Offer">Offer</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Ghosted">Ghosted</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="add-notes" placeholder="Recruiter name, salary range, etc." maxlength="300">
+        </div>
+      </div>
+      <div class="add-bar">
+        <button class="btn-primary" onclick="addJob()">Add Application</button>
+        <button class="btn-secondary" onclick="exportCSV()">&#x2B07; Export CSV</button>
+      </div>
+    </div>
+
+    <!-- View toggle + board -->
+    <div class="view-bar">
+      <h3 id="board-title">Your Applications</h3>
+      <div class="view-toggle">
+        <button class="view-btn active" id="btn-kanban" onclick="setView('kanban')">Kanban</button>
+        <button class="view-btn" id="btn-list" onclick="setView('list')">List</button>
+      </div>
+    </div>
+
+    <div id="kanban-view">
+      <!-- Rendered by JS -->
+    </div>
+    <div id="list-view" style="display:none;">
+      <!-- Rendered by JS -->
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== AUTO-FILL TAB ===== -->
+<div class="main-tab-content" id="tab-autofill">
+  <div class="autofill-wrap">
+
+    <!-- Paywall -->
+    <div class="paywall" id="paywall">
+      <h3>&#x1F510; Auto-Fill Helper</h3>
+      <p>Paste any job description and get 5 tailored answers to the most common application questions — instantly.</p>
+      <div class="price-row">
+        <div class="price-tag">$29</div>
+        <div class="price-per">/month</div>
+        <div class="price-old">$79</div>
+      </div>
+      <div class="paywall-features">
+        <div class="paywall-feature"><span>&#x2713;</span><span>AI answers tailored to each job description</span></div>
+        <div class="paywall-feature"><span>&#x2713;</span><span>5 questions covered: Why here, challenges, 5-year plan, strengths, reason for leaving</span></div>
+        <div class="paywall-feature"><span>&#x2713;</span><span>Copy-paste ready — save hours on every application</span></div>
+        <div class="paywall-feature"><span>&#x2713;</span><span>Unlimited uses + all ResumeAI tools included</span></div>
+      </div>
+      <a class="btn-pay" href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">&#x2728; Unlock Auto-Fill Helper — $29/mo</a>
+      <div class="paywall-divider">or enter access code</div>
+      <div class="code-row">
+        <input class="code-input" id="access-code" type="text" placeholder="Paste your access code here">
+        <button class="btn-unlock" onclick="redeemCode()">Unlock</button>
+      </div>
+      <div class="code-hint">Access code is emailed after purchase at <a href="https://payhip.com/b/gFaqD" target="_blank" style="color:var(--accent)">payhip.com/b/gFaqD</a></div>
+    </div>
+
+    <!-- Unlocked form (hidden until code redeemed) -->
+    <div id="autofill-form" style="display:none;">
+      <div class="autofill-card">
+        <h2>&#x1F4CB; Paste Job Description</h2>
+        <p>Add the full job posting. The more detail you include, the better your answers will be.</p>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label>Company <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;opacity:.7">(optional)</span></label>
+          <input type="text" id="af-company" placeholder="e.g. Stripe" maxlength="100">
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label>Role / Title <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;opacity:.7">(optional)</span></label>
+          <input type="text" id="af-role" placeholder="e.g. Product Manager" maxlength="100">
+        </div>
+        <div class="form-group">
+          <label>Job Description</label>
+          <textarea id="af-jd" rows="10" placeholder="Paste the full job description here..." maxlength="8000" oninput="updateCharCount(this,'af-cc')"></textarea>
+          <div class="char-count"><span id="af-cc">0</span> / 8,000</div>
+        </div>
+        <div class="add-bar" style="margin-top:20px;">
+          <button class="btn-primary" onclick="generateAnswers()">&#x2728; Generate Answers</button>
+        </div>
+        <div class="loader" id="af-loader"><div class="spinner"></div>Generating tailored answers…</div>
+        <div class="error-box" id="af-error"></div>
+      </div>
+
+      <div class="answers-section" id="answers-section">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Features -->
+<div class="features">
+  <h2>Everything You Need for Your Job Search</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">&#x1F4CC;</div>
+      <h3>Kanban & List View</h3>
+      <p>Track every application with status columns. Switch to list view for a full overview.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">&#x1F4CA;</div>
+      <h3>Live Stats</h3>
+      <p>See your response rate, interview count, and offer count update as you add applications.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">&#x2B07;</div>
+      <h3>CSV Export</h3>
+      <p>Download all your applications as a spreadsheet for offline review anytime.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">&#x2728;</div>
+      <h3>AI Answers</h3>
+      <p>Generate tailored application answers from any job description. Unlock with subscription.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-copy">© 2025 ResumeAI. All rights reserved.</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/tools.html">All Tools</a>
+    <a href="https://payhip.com/b/gFaqD" target="_blank" rel="noopener">Pricing</a>
+  </div>
+</footer>
+
+<script>
+// ========== STORAGE ==========
+const STORAGE_KEY = 'resumeai_jobs_v1';
+const UNLOCK_KEY  = 'resumeai_autofill_unlocked';
+
+function loadJobs() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+}
+function saveJobs(jobs) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
+}
+function isUnlocked() {
+  return localStorage.getItem(UNLOCK_KEY) === '1';
+}
+
+// ========== TABS ==========
+document.querySelectorAll('.main-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.main-tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    if (tab.dataset.tab === 'autofill') initAutofillTab();
+  });
+});
+
+// ========== TRACKER ==========
+let currentView = 'kanban';
+
+const STATUS_ORDER = ['Applied','PhoneScreen','Interview','Offer','Rejected','Ghosted'];
+const STATUS_LABELS = { Applied:'Applied', PhoneScreen:'Phone Screen', Interview:'Interview', Offer:'Offer', Rejected:'Rejected', Ghosted:'Ghosted' };
+const STATUS_ACCENT = { Applied:'var(--accent)', PhoneScreen:'#f59e0b', Interview:'var(--green)', Offer:'#d97706', Rejected:'var(--red)', Ghosted:'var(--muted)' };
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('btn-kanban').classList.toggle('active', v === 'kanban');
+  document.getElementById('btn-list').classList.toggle('active', v === 'list');
+  document.getElementById('kanban-view').style.display = v === 'kanban' ? '' : 'none';
+  document.getElementById('list-view').style.display   = v === 'list'   ? '' : 'none';
+  renderBoard();
+}
+
+function updateStats(jobs) {
+  const total = jobs.length;
+  const interviews = jobs.filter(j => j.status === 'Interview').length;
+  const offers = jobs.filter(j => j.status === 'Offer').length;
+  const responded = jobs.filter(j => ['PhoneScreen','Interview','Offer','Rejected'].includes(j.status)).length;
+  const rate = total > 0 ? Math.round((responded / total) * 100) : 0;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-interviews').textContent = interviews;
+  document.getElementById('stat-offers').textContent = offers;
+  document.getElementById('stat-rate').textContent = rate + '%';
+}
+
+function chipHtml(status) {
+  const label = STATUS_LABELS[status] || status;
+  return `<span class="chip chip-${status}">${label}</span>`;
+}
+
+function jobCardHtml(job) {
+  const urlLink = job.url ? `<a class="job-url" href="${escHtml(job.url)}" target="_blank" rel="noopener">View Posting ↗</a>` : '';
+  const notes = job.notes ? `<div class="job-notes">${escHtml(job.notes)}</div>` : '';
+  return `
+    <div class="job-card">
+      <div class="job-card-top">
+        <div class="job-company">${escHtml(job.company)}</div>
+        ${chipHtml(job.status)}
+      </div>
+      <div class="job-role">${escHtml(job.role)}</div>
+      <div class="job-meta">
+        ${job.date ? `<span class="job-date">${formatDate(job.date)}</span>` : ''}
+        ${urlLink}
+      </div>
+      ${notes}
+      <div class="job-actions">
+        <button class="btn-del" onclick="deleteJob('${job.id}')">Remove</button>
+      </div>
+    </div>`;
+}
+
+function renderBoard() {
+  const jobs = loadJobs();
+  updateStats(jobs);
+
+  if (currentView === 'kanban') {
+    const grouped = {};
+    STATUS_ORDER.forEach(s => grouped[s] = []);
+    jobs.forEach(j => { if (grouped[j.status]) grouped[j.status].push(j); });
+
+    const cols = STATUS_ORDER.map(status => {
+      const cards = grouped[status].map(jobCardHtml).join('') ||
+        '<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px 0;">No applications</div>';
+      return `
+        <div class="kanban-col">
+          <div class="kanban-col-header">
+            <div class="kanban-col-title" style="color:${STATUS_ACCENT[status]}">${STATUS_LABELS[status]}</div>
+            <div class="kanban-count">${grouped[status].length}</div>
+          </div>
+          <div class="kanban-cards">${cards}</div>
+        </div>`;
+    }).join('');
+
+    document.getElementById('kanban-view').innerHTML =
+      jobs.length === 0
+        ? emptyState()
+        : `<div class="kanban">${cols}</div>`;
+  } else {
+    if (jobs.length === 0) {
+      document.getElementById('list-view').innerHTML = emptyState();
+      return;
+    }
+    const rows = jobs.map(j => `
+      <tr>
+        <td><strong>${escHtml(j.company)}</strong></td>
+        <td>${escHtml(j.role)}</td>
+        <td>${chipHtml(j.status)}</td>
+        <td>${j.date ? formatDate(j.date) : '—'}</td>
+        <td>${j.url ? `<a class="job-url" href="${escHtml(j.url)}" target="_blank" rel="noopener">View ↗</a>` : '—'}</td>
+        <td>${escHtml(j.notes || '—')}</td>
+        <td><button class="btn-del" onclick="deleteJob('${j.id}')">Remove</button></td>
+      </tr>`).join('');
+    document.getElementById('list-view').innerHTML = `
+      <div class="list-table-wrap">
+        <table class="list-table">
+          <thead><tr>
+            <th>Company</th><th>Role</th><th>Status</th><th>Date</th><th>URL</th><th>Notes</th><th></th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+}
+
+function emptyState() {
+  return `<div class="empty-state"><div class="empty-icon">&#x1F4CB;</div><div>No applications yet. Add your first one above!</div></div>`;
+}
+
+function addJob() {
+  const company = document.getElementById('add-company').value.trim();
+  const role    = document.getElementById('add-role').value.trim();
+  if (!company || !role) { alert('Company and Role are required.'); return; }
+  const job = {
+    id:      Date.now().toString(36) + Math.random().toString(36).slice(2),
+    company, role,
+    url:     document.getElementById('add-url').value.trim(),
+    date:    document.getElementById('add-date').value,
+    status:  document.getElementById('add-status').value,
+    notes:   document.getElementById('add-notes').value.trim(),
+    created: Date.now(),
+  };
+  const jobs = loadJobs();
+  jobs.unshift(job);
+  saveJobs(jobs);
+  // Reset form
+  ['add-company','add-role','add-url','add-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('add-date').value = '';
+  document.getElementById('add-status').value = 'Applied';
+  renderBoard();
+}
+
+function deleteJob(id) {
+  if (!confirm('Remove this application?')) return;
+  saveJobs(loadJobs().filter(j => j.id !== id));
+  renderBoard();
+}
+
+function exportCSV() {
+  const jobs = loadJobs();
+  if (!jobs.length) { alert('No applications to export.'); return; }
+  const header = ['Company','Role','Status','Date Applied','URL','Notes'];
+  const rows = jobs.map(j => [j.company, j.role, STATUS_LABELS[j.status] || j.status, j.date || '', j.url || '', j.notes || ''].map(csvEsc));
+  const csv  = [header, ...rows].map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = 'job-applications.csv';
+  a.click();
+}
+
+function csvEsc(v) { return `"${String(v).replace(/"/g, '""')}"`; }
+function escHtml(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function formatDate(d) {
+  if (!d) return '';
+  try { return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); } catch { return d; }
+}
+
+// ========== AUTO-FILL TAB ==========
+function initAutofillTab() {
+  if (isUnlocked()) {
+    document.getElementById('paywall').style.display = 'none';
+    document.getElementById('autofill-form').style.display = '';
+  } else {
+    document.getElementById('paywall').style.display = '';
+    document.getElementById('autofill-form').style.display = 'none';
+  }
+}
+
+async function redeemCode() {
+  const code = document.getElementById('access-code').value.trim();
+  if (!code) { alert('Please enter your access code.'); return; }
+  try {
+    const res = await fetch('/api/redeem', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code }),
+    });
+    const data = await res.json();
+    if (data.valid) {
+      localStorage.setItem(UNLOCK_KEY, '1');
+      initAutofillTab();
+    } else {
+      alert('Invalid or already used access code. Please check and try again.');
+    }
+  } catch {
+    // If redeem endpoint not available, do simple check
+    if (code.length >= 8) {
+      localStorage.setItem(UNLOCK_KEY, '1');
+      initAutofillTab();
+    } else {
+      alert('Invalid access code. Purchase at payhip.com/b/gFaqD to get yours.');
+    }
+  }
+}
+
+async function generateAnswers() {
+  const jd      = document.getElementById('af-jd').value.trim();
+  const company = document.getElementById('af-company').value.trim();
+  const role    = document.getElementById('af-role').value.trim();
+
+  if (!jd) { showAfError('Please paste a job description first.'); return; }
+
+  const loader  = document.getElementById('af-loader');
+  const errBox  = document.getElementById('af-error');
+  const section = document.getElementById('answers-section');
+  errBox.classList.remove('visible');
+  section.classList.remove('visible');
+  loader.classList.add('visible');
+
+  try {
+    const res = await fetch('/api/job-answers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobDescription: jd, role, company }),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    renderAnswers(data.answers || []);
+    section.classList.add('visible');
+  } catch (err) {
+    showAfError('Something went wrong. Please try again.');
+    console.error(err);
+  } finally {
+    loader.classList.remove('visible');
+  }
+}
+
+function renderAnswers(answers) {
+  const section = document.getElementById('answers-section');
+  section.innerHTML = answers.map((a, i) => `
+    <div class="answer-card">
+      <div class="answer-q">Q${i+1}: ${escHtml(a.question)}</div>
+      <div class="answer-text" id="ans-${i}">${escHtml(a.answer)}</div>
+      <button class="btn-copy" onclick="copyAnswer(${i}, this)">Copy Answer</button>
+    </div>`).join('');
+}
+
+function copyAnswer(i, btn) {
+  const text = document.getElementById('ans-' + i).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy Answer'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function showAfError(msg) {
+  const e = document.getElementById('af-error');
+  e.textContent = msg;
+  e.classList.add('visible');
+}
+
+function updateCharCount(el, spanId) {
+  document.getElementById(spanId).textContent = el.value.length;
+}
+
+// ========== INIT ==========
+// Set today's date as default
+document.getElementById('add-date').value = new Date().toISOString().split('T')[0];
+renderBoard();
+initAutofillTab();
+</script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Affiliate Content Writer AI — Generate High-Converting Affiliate Articles</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0f1e; --surface: #111827; --border: #1f2937; --accent: #6366f1; --accent2: #8b5cf6; --text: #f1f5f9; --muted: #64748b; --green: #10b981; --red: #ef4444; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; min-height: 100vh; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 40px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    .logo { font-size: 20px; font-weight: 800; background: linear-gradient(135deg, #6366f1, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--muted); font-size: 14px; text-decoration: none; transition: color .15s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; text-decoration: none; transition: background .2s; }
+    .nav-cta:hover { background: #4f46e5; }
+
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .badge { display: inline-block; background: rgba(99,102,241,.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,.3); padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
+    .hero h1 span { background: linear-gradient(135deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { color: var(--muted); font-size: 17px; max-width: 520px; margin: 0 auto; line-height: 1.6; }
+
+    .features { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 24px; }
+    .feat { background: rgba(99,102,241,.08); border: 1px solid rgba(99,102,241,.2); padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #a5b4fc; font-weight: 600; }
+
+    .app { max-width: 960px; margin: 40px auto; padding: 0 20px; }
+    .app-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 28px 28px 0; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    input, select { background: #0d1425; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 10px 14px; outline: none; transition: border-color .15s; font-family: inherit; }
+    input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--surface); }
+
+    .article-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 28px; margin-top: 20px; }
+    .type-btn { background: #0d1425; border: 1px solid var(--border); border-radius: 10px; padding: 12px 8px; cursor: pointer; text-align: center; transition: all .15s; }
+    .type-btn:hover { border-color: var(--accent); }
+    .type-btn.active { border-color: var(--accent); background: rgba(99,102,241,.1); }
+    .type-icon { font-size: 22px; margin-bottom: 4px; }
+    .type-name { font-size: 12px; font-weight: 700; color: var(--text); }
+    .type-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .generate-bar { padding: 24px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--border); margin-top: 20px; }
+    .btn-generate { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 36px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; }
+    .btn-generate:hover:not(:disabled) { opacity: .88; }
+    .btn-generate:disabled { opacity: .5; cursor: not-allowed; }
+    .free-note { color: var(--muted); font-size: 13px; }
+    .uses-counter { background: rgba(99,102,241,.1); border: 1px solid rgba(99,102,241,.2); color: #a5b4fc; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+
+    .loader { display: none; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; padding: 20px 28px; }
+    .loader.visible { display: flex; }
+    .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; flex-shrink: 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-box { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #fca5a5; font-size: 14px; margin: 0 28px 16px; display: none; }
+    .error-box.visible { display: block; }
+
+    .output-section { padding: 0 28px 28px; display: none; }
+    .output-section.visible { display: block; }
+
+    .earnings-card { background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(99,102,241,.08)); border: 1px solid rgba(16,185,129,.2); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .earnings-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #6ee7b7; margin-bottom: 12px; }
+    .earnings-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .earnings-stat { text-align: center; }
+    .earnings-value { font-size: 22px; font-weight: 800; color: var(--green); }
+    .earnings-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .earnings-note { font-size: 12px; color: var(--muted); margin-top: 12px; }
+
+    .output-card { background: #0d1425; border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+    .output-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .output-text { font-size: 14px; line-height: 1.8; color: #cbd5e1; white-space: pre-wrap; max-height: 600px; overflow-y: auto; }
+    .output-text::-webkit-scrollbar { width: 6px; }
+    .output-text::-webkit-scrollbar-track { background: var(--bg); }
+    .output-text::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .output-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-copy { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: border-color .15s; }
+    .btn-copy:hover { border-color: var(--accent); }
+    .btn-download { background: var(--green); color: white; border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; transition: opacity .15s; }
+    .btn-download:hover { opacity: .85; }
+
+    .stats-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .stat-chip { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; background: rgba(99,102,241,.1); color: #a5b4fc; border: 1px solid rgba(99,102,241,.2); }
+
+    .paywall { background: linear-gradient(135deg, rgba(99,102,241,.08), rgba(139,92,246,.08)); border: 1px solid rgba(99,102,241,.25); border-radius: 16px; padding: 32px 28px; margin: 0 0 28px; display: none; text-align: center; }
+    .paywall.visible { display: block; }
+    .paywall h3 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+    .paywall p { color: var(--muted); font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
+    .price-row { font-size: 40px; font-weight: 900; color: var(--accent); margin-bottom: 8px; }
+    .price-sub { color: var(--muted); font-size: 13px; margin-bottom: 20px; }
+    .paywall-perks { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+    .perk { font-size: 13px; color: #a5b4fc; }
+    .perk::before { content: "✓ "; color: var(--green); font-weight: 700; }
+    .btn-pay { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; border: none; padding: 14px 40px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity .2s; text-decoration: none; display: inline-block; }
+    .btn-pay:hover { opacity: .88; }
+
+    footer { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 60px; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 700px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .form-grid { grid-template-columns: 1fr; }
+      .article-types { grid-template-columns: 1fr 1fr; }
+      .earnings-grid { grid-template-columns: 1fr 1fr; }
+      .generate-bar { flex-direction: column; align-items: stretch; }
+      .btn-generate { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="logo" href="/">AI Tools</a>
+    <div class="nav-links">
+      <a href="/">Resume</a>
+      <a href="/tools">All Tools</a>
+      <a href="/seo-writer">SEO Writer</a>
+      <a href="/api-docs">API</a>
+    </div>
+    <a class="nav-cta" href="https://payhip.com/b/gFaqD" target="_blank">Upgrade $29/mo</a>
+  </nav>
+
+  <div class="hero">
+    <div class="badge">Affiliate Content Writer</div>
+    <h1>Generate Articles That <span>Convert & Earn</span></h1>
+    <p>Create SEO-optimized affiliate articles — reviews, comparisons, best-of lists, and how-to guides — in seconds.</p>
+    <div class="features">
+      <span class="feat">Amazon Associates</span>
+      <span class="feat">ShareASale</span>
+      <span class="feat">ClickBank</span>
+      <span class="feat">SEO Optimized</span>
+      <span class="feat">Earnings Estimator</span>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="app-card">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Product Name *</label>
+          <input type="text" id="product" placeholder="e.g. Ninja Air Fryer XL" />
+        </div>
+        <div class="form-group">
+          <label>Affiliate Program *</label>
+          <select id="program">
+            <option value="amazon">Amazon Associates</option>
+            <option value="shareasale">ShareASale</option>
+            <option value="clickbank">ClickBank</option>
+            <option value="custom">Custom / Private</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Niche / Category *</label>
+          <input type="text" id="niche" placeholder="e.g. Kitchen Appliances, Fitness, Finance" />
+        </div>
+        <div class="form-group">
+          <label>Target Keyword *</label>
+          <input type="text" id="keyword" placeholder="e.g. best air fryer for family" />
+        </div>
+      </div>
+
+      <div class="article-types" id="articleTypes">
+        <div class="type-btn active" data-type="review">
+          <div class="type-icon">⭐</div>
+          <div class="type-name">Review</div>
+          <div class="type-desc">Detailed product review</div>
+        </div>
+        <div class="type-btn" data-type="comparison">
+          <div class="type-icon">⚖️</div>
+          <div class="type-name">Comparison</div>
+          <div class="type-desc">vs competitor</div>
+        </div>
+        <div class="type-btn" data-type="best-of">
+          <div class="type-icon">🏆</div>
+          <div class="type-name">Best-Of</div>
+          <div class="type-desc">Roundup list</div>
+        </div>
+        <div class="type-btn" data-type="how-to">
+          <div class="type-icon">📖</div>
+          <div class="type-name">How-To</div>
+          <div class="type-desc">Step-by-step guide</div>
+        </div>
+      </div>
+
+      <div class="generate-bar">
+        <button class="btn-generate" id="generateBtn" onclick="generate()">Generate Article</button>
+        <span class="uses-counter" id="usesCounter">2 free articles remaining</span>
+        <span class="free-note">No account needed · Article ready in ~15s</span>
+      </div>
+
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <span id="loaderMsg">Writing your affiliate article… this takes ~15 seconds</span>
+      </div>
+      <div class="error-box" id="errorBox"></div>
+
+      <div class="output-section" id="outputSection">
+        <div class="earnings-card" id="earningsCard"></div>
+        <div class="stats-row" id="statsRow"></div>
+        <div class="output-card">
+          <div class="output-label">
+            <span>Generated Article</span>
+            <span id="wordCountBadge" style="font-size:11px;color:var(--muted);font-weight:500;"></span>
+          </div>
+          <div class="output-text" id="articleOutput"></div>
+          <div class="output-actions">
+            <button class="btn-copy" onclick="copyArticle()">Copy Article</button>
+            <button class="btn-download" onclick="downloadArticle()">Download .txt</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="paywall" id="paywall">
+        <h3>🔒 Free Limit Reached</h3>
+        <p>You've used your 2 free affiliate articles. Upgrade to generate unlimited high-converting affiliate content across all programs and niches.</p>
+        <div class="price-row">$29<span style="font-size:18px;color:var(--muted)">/month</span></div>
+        <div class="price-sub">Unlimited articles · All programs · Priority generation</div>
+        <div class="paywall-perks">
+          <span class="perk">Unlimited affiliate articles</span>
+          <span class="perk">All 4 article types</span>
+          <span class="perk">All affiliate programs</span>
+          <span class="perk">Earnings calculator</span>
+          <span class="perk">Download & copy</span>
+        </div>
+        <a class="btn-pay" href="https://payhip.com/b/gFaqD" target="_blank">Unlock Unlimited Access</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 AI Tools Suite · <a href="/">Home</a> · <a href="/tools">All Tools</a> · <a href="/api-docs">API Docs</a></p>
+    <p style="margin-top:8px;">Affiliate articles for educational purposes. Always disclose affiliate relationships.</p>
+  </footer>
+
+  <script>
+    let selectedType = 'review';
+    let usesLeft = parseInt(localStorage.getItem('affiliateUsesLeft') ?? '2');
+    let lastTitle = '';
+    let lastArticle = '';
+
+    updateCounter();
+
+    document.querySelectorAll('.type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedType = btn.dataset.type;
+      });
+    });
+
+    function updateCounter() {
+      const el = document.getElementById('usesCounter');
+      if (usesLeft <= 0) {
+        el.textContent = '0 free articles remaining';
+        el.style.background = 'rgba(239,68,68,.1)';
+        el.style.borderColor = 'rgba(239,68,68,.3)';
+        el.style.color = '#fca5a5';
+      } else {
+        el.textContent = `${usesLeft} free article${usesLeft === 1 ? '' : 's'} remaining`;
+      }
+    }
+
+    async function generate() {
+      if (usesLeft <= 0) {
+        document.getElementById('paywall').classList.add('visible');
+        document.getElementById('paywall').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const product = document.getElementById('product').value.trim();
+      const program = document.getElementById('program').value;
+      const niche = document.getElementById('niche').value.trim();
+      const keyword = document.getElementById('keyword').value.trim();
+
+      if (!product) return showError('Please enter a product name.');
+      if (!niche) return showError('Please enter a niche or category.');
+      if (!keyword) return showError('Please enter a target keyword.');
+
+      hideError();
+      document.getElementById('outputSection').classList.remove('visible');
+      document.getElementById('paywall').classList.remove('visible');
+      document.getElementById('loader').classList.add('visible');
+      document.getElementById('generateBtn').disabled = true;
+
+      try {
+        const res = await fetch('/api/affiliate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ product, program, niche, keyword, articleType: selectedType }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Generation failed');
+
+        lastTitle = data.title || '';
+        lastArticle = data.article || '';
+
+        // Render article
+        document.getElementById('articleOutput').textContent = `${lastTitle}\n\n${lastArticle}`;
+        document.getElementById('wordCountBadge').textContent = `~${data.wordCount?.toLocaleString() || 0} words`;
+
+        // Render earnings
+        if (data.estimatedEarnings) {
+          const e = data.estimatedEarnings;
+          document.getElementById('earningsCard').innerHTML = `
+            <div class="earnings-title">💰 Estimated Earnings Potential</div>
+            <div class="earnings-grid">
+              <div class="earnings-stat">
+                <div class="earnings-value">${e.commissionRange}</div>
+                <div class="earnings-label">Commission Rate</div>
+              </div>
+              <div class="earnings-stat">
+                <div class="earnings-value">${e.avgCommission}</div>
+                <div class="earnings-label">Per Sale (avg)</div>
+              </div>
+              <div class="earnings-stat">
+                <div class="earnings-value">${e.monthly100}</div>
+                <div class="earnings-label">100 sales/mo</div>
+              </div>
+              <div class="earnings-stat">
+                <div class="earnings-value">${e.monthly500}</div>
+                <div class="earnings-label">500 sales/mo</div>
+              </div>
+            </div>
+            <div class="earnings-note">Based on ${e.note}. Actual earnings vary.</div>
+          `;
+        }
+
+        // Stats row
+        const typeLabels = { review: '⭐ Review', comparison: '⚖️ Comparison', 'best-of': '🏆 Best-Of', 'how-to': '📖 How-To' };
+        document.getElementById('statsRow').innerHTML = `
+          <span class="stat-chip">${typeLabels[selectedType] || selectedType}</span>
+          <span class="stat-chip">${program.charAt(0).toUpperCase() + program.slice(1)}</span>
+          <span class="stat-chip">${keyword}</span>
+          <span class="stat-chip">SEO Optimized</span>
+        `;
+
+        document.getElementById('outputSection').classList.add('visible');
+        document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        usesLeft--;
+        localStorage.setItem('affiliateUsesLeft', usesLeft);
+        updateCounter();
+
+        if (usesLeft <= 0) {
+          setTimeout(() => {
+            document.getElementById('paywall').classList.add('visible');
+          }, 1500);
+        }
+      } catch (err) {
+        showError(err.message || 'Something went wrong. Please try again.');
+      } finally {
+        document.getElementById('loader').classList.remove('visible');
+        document.getElementById('generateBtn').disabled = false;
+      }
+    }
+
+    function copyArticle() {
+      const text = `${lastTitle}\n\n${lastArticle}`;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.querySelector('.btn-copy');
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = orig, 2000);
+      });
+    }
+
+    function downloadArticle() {
+      const text = `${lastTitle}\n\n${lastArticle}`;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const safe = (lastTitle || 'affiliate-article').replace(/[^a-z0-9]+/gi, '-').toLowerCase().slice(0, 60);
+      a.download = `${safe}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorBox');
+      el.textContent = msg;
+      el.classList.add('visible');
+    }
+
+    function hideError() {
+      document.getElementById('errorBox').classList.remove('visible');
+    }
+  </script>
+</body>
+</html>
