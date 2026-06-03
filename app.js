@@ -1,9 +1,9 @@
 // ResumeAI frontend logic
-// Payment: Payhip product page — buyer receives access code in download
+// Payment: Gumroad product page — buyer receives access code in download
 
 const API_URL = "/api/generate";
-// TODO: Replace with your Payhip product URL after creating the product
-const PAYHIP_URL = "https://payhip.com/b/gFaqD";
+// TODO: Replace with your Gumroad product URL after creating the product
+const PAYHIP_URL = "https://dzyntwrk.gumroad.com";
 
 let usesRemaining = parseInt(localStorage.getItem("resumeai_uses") ?? "1");
 
@@ -91,7 +91,7 @@ function redeemCode() {
       } else {
         input.style.borderColor = "#ef4444";
         input.value = "";
-        input.placeholder = "Invalid code — check your Payhip download";
+        input.placeholder = "Invalid code — check your Gumroad download";
         setTimeout(() => {
           input.style.borderColor = "";
           input.placeholder = "Paste your access code here…";

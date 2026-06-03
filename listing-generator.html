@@ -125,10 +125,10 @@
         <h3>Unlock Unlimited Listings</h3>
         <p>You've used your free listing. Get 50 more for a one-time payment.</p>
         <div class="price-row">$9</div>
-        <button class="btn-pay" onclick="window.open('https://payhip.com/b/gFaqD','_blank')">Get 50 Listings — $9 →</button>
+        <button class="btn-pay" onclick="window.open('https://dzyntwrk.gumroad.com','_blank')">Get 50 Listings — $9 →</button>
         <p style="margin-top:16px;font-size:12px;">Already purchased? Enter your access code below.</p>
         <div style="display:flex;gap:10px;margin-top:10px;">
-          <input type="text" id="access-code" placeholder="Access code from Payhip…" style="flex:1;background:#0d1425;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:10px 14px;outline:none;font-family:monospace;" />
+          <input type="text" id="access-code" placeholder="Access code from Gumroad…" style="flex:1;background:#0d1425;border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:10px 14px;outline:none;font-family:monospace;" />
           <button onclick="redeemCode()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:10px 18px;border-radius:8px;cursor:pointer;font-weight:700;">Unlock</button>
         </div>
       </div>
@@ -162,7 +162,7 @@
   </footer>
 
   <script>
-    const PAYHIP_URL = "https://payhip.com/b/gFaqD";
+    const PAYHIP_URL = "https://dzyntwrk.gumroad.com";
     let usesRemaining = parseInt(localStorage.getItem("listingai_uses") ?? "1");
 
     function updateNote() {
@@ -196,7 +196,7 @@
             updateNote(); input.value = "";
           } else {
             input.style.borderColor = "#ef4444"; input.placeholder = "Invalid code";
-            setTimeout(() => { input.style.borderColor = ""; input.placeholder = "Access code from Payhip…"; }, 3000);
+            setTimeout(() => { input.style.borderColor = ""; input.placeholder = "Access code from Gumroad…"; }, 3000);
           }
         }).catch(() => showError("Could not validate code. Try again."));
     }

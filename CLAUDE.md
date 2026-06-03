@@ -6,7 +6,7 @@
 ---
 
 ## 🔴 CRITICAL BLOCKER (Do this first — 2 minutes)
-Connect PayPal or Stripe to Payhip: **payhip.com/settings/payments**  
+Connect PayPal or Stripe to Gumroad: **app.gumroad.com/settings/payments**  
 All 19 products are configured. Revenue is blocked until payment is connected.
 
 ---
@@ -21,7 +21,7 @@ All 19 products are configured. Revenue is blocked until payment is connected.
 | ResumeAI standalone | resume-tool-zeta.vercel.app | separate |
 | LegalDraft standalone | legal-docs-rho.vercel.app | separate |
 
-## Payhip Store: payhip.com/DzyTools
+## Gumroad Store: dzyntwrk.gumroad.com
 
 ### Product Codes (19 products)
 | Code | Product | Price |
@@ -56,10 +56,10 @@ All 19 products are configured. Revenue is blocked until payment is connected.
 - `chrome-extension/` — Smart Tab Manager (Manifest V3)
 - `google-apps-scripts/` — email-automation.gs, data-aggregator.gs, invoice-generator.gs, sheet-dashboard.gs
 - Fiverr gigs ready: see FIVERR_QUICK_START.md (10 gigs, $10–$35 each)
-- Payhip bundles: bWh4J (Python), ARJKP (Sheets), KGLUC (Chrome)
+- Gumroad bundles: bWh4J (Python), ARJKP (Sheets), KGLUC (Chrome)
 
 ### ✅ TIER 2 — All deployed to Vercel
-- `/` — Resume & Cover Letter AI → Payhip gFaqD ($4.99/10 uses)
+- `/` — Resume & Cover Letter AI → Gumroad gFaqD ($4.99/10 uses)
 - `/listing-generator` — Etsy/eBay Listing Generator
 - `/seo-writer` — SEO Blog Article Writer
 - `/email-sequences` — Email Sequence Generator
@@ -73,7 +73,7 @@ All 19 products are configured. Revenue is blocked until payment is connected.
 - `/job-tracker` — Job Application Tracker
 
 ### ✅ TIER 4 — All deployed
-- `/legal-docs` — Legal Document Generator → Payhip XmlgN ($19)
+- `/legal-docs` — Legal Document Generator → Gumroad XmlgN ($19)
 - `/ad-copy` — Ad Copy A/B Generator
 - `/lead-qualifier` — Lead Qualifier & Scorer
 - `/code-reviewer` — AI Code Reviewer
@@ -118,8 +118,8 @@ Launch Phase 1: Upload 5 hero products today (ResumeAI, LegalDraft, AI Agency, C
 - Social: @thedizzyinc | Cash App: $DzyNtwrk
 
 ## Key Links
-- Payhip: payhip.com/DzyTools
-- Payhip payments: payhip.com/settings/payments ← CONNECT THIS NOW
+- Gumroad: dzyntwrk.gumroad.com
+- Gumroad payments: app.gumroad.com/settings/payments ← CONNECT THIS NOW
 - Gumroad: gumroad.com/dzyntwrk
 - Vercel: vercel.com/dizzy-sai-projects1
 - Instagram: @thedizzyinc
