@@ -1,0 +1,47 @@
+[
+  {
+    "title": "[Weekly Thread] Introductions — Who Are You? 👋",
+    "body": "Welcome to our weekly introductions thread!\n\nNew to the community? Drop a comment below and tell us:\n\n- **Who you are** (first name or username is fine)\n- **What brings you here**\n- **One thing you're working on or excited about**\n\nLet's get to know each other. The more you engage, the better this community gets! 🙌\n\n---\n*This thread is posted automatically every Monday. Past threads are archived in the wiki.*",
+    "day": "monday",
+    "time": "09:00",
+    "flair": "Weekly Thread",
+    "sticky": true,
+    "distinguish": true
+  },
+  {
+    "title": "[Weekly Thread] Share Your Work & Get Feedback 🛠️",
+    "body": "It's Wednesday — time to show off what you've been building!\n\nShare anything you're working on and get constructive feedback from the community:\n\n- A link to your project, post, or content\n- A brief description of what it is\n- What kind of feedback you're looking for\n\nBe specific in your asks and generous with your feedback to others. Let's build together. 💪\n\n---\n*Posted automatically every Wednesday.*",
+    "day": "wednesday",
+    "time": "10:00",
+    "flair": "Weekly Thread",
+    "sticky": false,
+    "distinguish": true
+  },
+  {
+    "title": "[Weekly Thread] Questions & Community Help 🙋",
+    "body": "Got a question that doesn't warrant its own post? Ask it here!\n\nThis is a judgment-free zone — no question is too basic. The community is here to help.\n\n**How to get the best answer:**\n- Be specific about your situation\n- Include any relevant context\n- Let us know what you've already tried\n\nRespond to others while you're here — paying it forward keeps this community strong!\n\n---\n*Posted automatically every Friday.*",
+    "day": "friday",
+    "time": "08:00",
+    "flair": "Weekly Thread",
+    "sticky": false,
+    "distinguish": true
+  },
+  {
+    "title": "[Weekend] What Are You Working On This Weekend? 🗓️",
+    "body": "Happy weekend! 🎉\n\nWhat's on your agenda? Whether it's a side project, a personal goal, or just catching up on rest — share it here for a little accountability and community support.\n\nDrop a comment below and check back in Monday to report how it went!\n\n---\n*Posted automatically every Saturday.*",
+    "day": "saturday",
+    "time": "09:00",
+    "flair": "Weekend",
+    "sticky": false,
+    "distinguish": true
+  },
+  {
+    "title": "[Monthly] Community Rules Reminder & Feedback Thread 📋",
+    "body": "Welcome to our monthly community check-in!\n\n**Quick Rules Reminder:**\n1. Be respectful — no personal attacks or harassment\n2. Stay on topic — keep posts relevant to the subreddit\n3. No spam or self-promotion without community value\n4. Use the correct post flair\n5. Search before posting — your question may already be answered\n\n**Community Feedback:**\nHave suggestions for improving this subreddit? Drop them below. We read every comment and consider all feedback seriously.\n\nThank you for being part of this community! 🙏\n\n---\n*Posted automatically on the 1st of each month.*",
+    "day": "monday",
+    "time": "10:00",
+    "flair": "Meta",
+    "sticky": true,
+    "distinguish": true
+  }
+]

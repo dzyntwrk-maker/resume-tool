@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dizzy Signals — Weekly Trading Newsletter</title>
+  <style>
+    /* ---- Reset & base ---- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0f1e;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    /* ---- Wrapper ---- */
+    .wrapper {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 16px 40px;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 100%);
+      border-radius: 0 0 16px 16px;
+      padding: 36px 32px 28px;
+      text-align: center;
+    }
+    .header .brand {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #bfdbfe;
+      margin-bottom: 6px;
+    }
+    .header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -1px;
+    }
+    .header h1 span {
+      color: #fbbf24;
+    }
+    .header .tagline {
+      margin-top: 8px;
+      color: #dbeafe;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    .header .issue-date {
+      margin-top: 14px;
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 4px 16px;
+      font-size: 12px;
+      color: #e0f2fe;
+    }
+
+    /* ---- Intro ---- */
+    .intro {
+      margin: 28px 0 20px;
+      padding: 20px 24px;
+      background: #111827;
+      border-radius: 12px;
+      border-left: 4px solid #6366f1;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+    .intro strong { color: #e2e8f0; }
+
+    /* ---- Section headings ---- */
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #6366f1;
+      margin: 32px 0 12px;
+    }
+
+    /* ---- Signals table ---- */
+    .signals-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #111827;
+    }
+    .signals-table thead tr {
+      background: #1e293b;
+    }
+    .signals-table th {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+    .signals-table tbody tr {
+      border-top: 1px solid #1e293b;
+      transition: background 0.15s;
+    }
+    .signals-table tbody tr:hover { background: #1a2235; }
+    .signals-table td {
+      padding: 14px;
+      font-size: 14px;
+      color: #cbd5e1;
+      vertical-align: top;
+    }
+    .signals-table .ticker-cell {
+      font-weight: 700;
+      color: #e2e8f0;
+      font-size: 15px;
+    }
+    .signals-table .price-cell {
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Signal badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .badge-buy  { background: #064e3b; color: #34d399; border: 1px solid #065f46; }
+    .badge-sell { background: #450a0a; color: #f87171; border: 1px solid #7f1d1d; }
+    .badge-hold { background: #422006; color: #fbbf24; border: 1px solid #78350f; }
+
+    /* Confidence bar */
+    .conf-wrap { display: flex; align-items: center; gap: 8px; }
+    .conf-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: #1e293b;
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 60px;
+    }
+    .conf-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
+    .conf-buy  { background: #34d399; }
+    .conf-sell { background: #f87171; }
+    .conf-hold { background: #fbbf24; }
+    .conf-pct { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+
+    /* Notes */
+    .notes-text {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    /* ---- Indicator detail cards ---- */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    @media (max-width: 480px) {
+      .detail-grid { grid-template-columns: 1fr; }
+    }
+    .detail-card {
+      background: #111827;
+      border-radius: 10px;
+      padding: 16px 18px;
+      border: 1px solid #1e293b;
+    }
+    .detail-card .card-ticker {
+      font-size: 14px;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .detail-card .metric-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #64748b;
+      padding: 3px 0;
+      border-bottom: 1px solid #1e293b;
+    }
+    .detail-card .metric-row:last-child { border-bottom: none; }
+    .detail-card .metric-row span:last-child { color: #94a3b8; font-family: 'Courier New', monospace; }
+
+    /* ---- CTA section ---- */
+    .cta-box {
+      margin-top: 36px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
+      border-radius: 16px;
+      padding: 32px;
+      text-align: center;
+    }
+    .cta-box h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+    .cta-box p {
+      color: #c7d2fe;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .plans {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .plan-card {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+      min-width: 140px;
+    }
+    .plan-card .plan-price {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fbbf24;
+    }
+    .plan-card .plan-name {
+      font-size: 12px;
+      color: #a5b4fc;
+      margin-top: 2px;
+    }
+    .plan-card .plan-features {
+      font-size: 11px;
+      color: #818cf8;
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+    .cta-btn {
+      display: inline-block;
+      background: linear-gradient(90deg, #fbbf24, #f59e0b);
+      color: #0a0f1e;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 14px 32px;
+      border-radius: 999px;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+    }
+
+    /* ---- Disclaimer ---- */
+    .disclaimer {
+      margin-top: 32px;
+      padding: 18px 20px;
+      background: #0f172a;
+      border-radius: 10px;
+      border: 1px solid #1e293b;
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.7;
+    }
+    .disclaimer strong { color: #64748b; }
+
+    /* ---- Footer ---- */
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 11px;
+      color: #334155;
+      padding-bottom: 20px;
+    }
+    .footer a { color: #6366f1; text-decoration: none; }
+
+    /* Pct change color */
+    .pos { color: #34d399; }
+    .neg { color: #f87171; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">Dizzy Inc · AI-Powered Trading Intelligence</div>
+    <h1>Dizzy <span>Signals</span></h1>
+    <div class="tagline">Clarity in Complexity. Automation in Action.</div>
+    <div class="issue-date">{{ date }}</div>
+  </div>
+
+  <!-- Intro -->
+  <div class="intro">
+    <strong>This week's scan</strong> covers {{ signals | length }} asset(s). Signals are generated using a 4-indicator confluence model: RSI, MACD, Bollinger Bands, and 50/200-day MA crossover. A <strong>BUY</strong> or <strong>SELL</strong> requires at least 2 indicators in agreement.
+  </div>
+
+  <!-- Signals Table -->
+  <div class="section-title">Weekly Signals</div>
+  <table class="signals-table">
+    <thead>
+      <tr>
+        <th>Ticker</th>
+        <th>Signal</th>
+        <th>Price</th>
+        <th>RSI</th>
+        <th>MACD</th>
+        <th>Confidence</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in signals %}
+      <tr>
+        <td class="ticker-cell">
+          {{ s.ticker }}
+          <div class="notes-text" style="margin-top:2px;">
+            {% if s.pct_change >= 0 %}
+              <span class="pos">+{{ s.pct_change }}%</span>
+            {% else %}
+              <span class="neg">{{ s.pct_change }}%</span>
+            {% endif %}
+          </div>
+        </td>
+        <td>
+          {% if s.action == "BUY" %}
+            <span class="badge badge-buy">Buy</span>
+          {% elif s.action == "SELL" %}
+            <span class="badge badge-sell">Sell</span>
+          {% else %}
+            <span class="badge badge-hold">Hold</span>
+          {% endif %}
+        </td>
+        <td class="price-cell">${{ s.price }}</td>
+        <td>{{ s.rsi }}</td>
+        <td style="font-family: 'Courier New', monospace; font-size:12px;">
+          {{ s.macd_value }}<br>
+          <span style="color:#64748b;font-size:11px;">{{ s.macd_crossover }}</span>
+        </td>
+        <td>
+          <div class="conf-wrap">
+            <div class="conf-bar-bg">
+              <div class="conf-bar-fill conf-{{ s.action | lower }}" style="width:{{ s.confidence }}%;"></div>
+            </div>
+            <span class="conf-pct">{{ s.confidence }}%</span>
+          </div>
+        </td>
+        <td>
+          <div class="notes-text">{{ s.notes }}</div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Indicator Detail Cards -->
+  <div class="section-title">Indicator Breakdown</div>
+  <div class="detail-grid">
+    {% for s in signals %}
+    <div class="detail-card">
+      <div class="card-ticker">
+        {{ s.ticker }}
+        {% if s.action == "BUY" %}
+          <span class="badge badge-buy" style="font-size:10px;">Buy</span>
+        {% elif s.action == "SELL" %}
+          <span class="badge badge-sell" style="font-size:10px;">Sell</span>
+        {% else %}
+          <span class="badge badge-hold" style="font-size:10px;">Hold</span>
+        {% endif %}
+      </div>
+      <div class="metric-row"><span>Price</span><span>${{ s.price }}</span></div>
+      <div class="metric-row"><span>RSI (14)</span><span>{{ s.rsi }}</span></div>
+      <div class="metric-row"><span>MACD</span><span>{{ s.macd_value }}</span></div>
+      <div class="metric-row"><span>MACD Signal</span><span>{{ s.macd_signal }}</span></div>
+      <div class="metric-row"><span>BB Upper</span><span>${{ s.bb_upper }}</span></div>
+      <div class="metric-row"><span>BB Lower</span><span>${{ s.bb_lower }}</span></div>
+      <div class="metric-row"><span>BB Position</span><span>{{ s.bb_position | upper }}</span></div>
+      <div class="metric-row"><span>MA 50</span><span>${{ s.ma50 }}</span></div>
+      <div class="metric-row"><span>MA 200</span><span>${{ s.ma200 }}</span></div>
+      <div class="metric-row">
+        <span>vs 200MA</span>
+        <span {% if s.ma_above_200 %}style="color:#34d399"{% else %}style="color:#f87171"{% endif %}>
+          {{ "ABOVE" if s.ma_above_200 else "BELOW" }}
+        </span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h2>Upgrade to Premium Signals</h2>
+    <p>Get real-time alerts, more tickers, and full trade setups every week.</p>
+    <div class="plans">
+      <div class="plan-card">
+        <div class="plan-price">$20</div>
+        <div class="plan-name">/month · Starter</div>
+        <div class="plan-features">
+          Weekly newsletter<br>
+          10 tickers/week<br>
+          Signal table + charts
+        </div>
+      </div>
+      <div class="plan-card">
+        <div class="plan-price">$50</div>
+        <div class="plan-name">/month · Premium</div>
+        <div class="plan-features">
+          Everything in Starter<br>
+          Real-time email alerts<br>
+          Crypto + options<br>
+          Direct Discord access
+        </div>
+      </div>
+    </div>
+    <a class="cta-btn" href="https://YOUR_SUBSTACK_URL.substack.com/subscribe">Subscribe on Substack →</a>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="disclaimer">
+    <strong>Disclaimer & Risk Warning:</strong> Dizzy Signals is published by Dizzy Inc for <strong>educational and entertainment purposes only</strong>. Nothing in this newsletter constitutes financial advice, investment advice, trading advice, or any other advice of any kind. The signals and analysis presented are algorithmic outputs based on publicly available technical indicators and are not personalized to your financial situation. <strong>Past signal performance does not guarantee future results.</strong> All trading and investing involves substantial risk of loss. You could lose some or all of your invested capital. Cryptocurrencies, stocks, and other financial instruments are highly volatile and may not be suitable for all investors. Always conduct your own due diligence (DYOR) and consult with a qualified, licensed financial advisor before making any investment or trading decisions. Dizzy Inc is not a registered investment advisor, broker-dealer, or financial planner.
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    &copy; {{ year }} Dizzy Inc &nbsp;·&nbsp;
+    <a href="https://dzyntwrk.gumroad.com">dzyntwrk.gumroad.com</a> &nbsp;·&nbsp;
+    <a href="https://instagram.com/thedizzyinc">@thedizzyinc</a>
+    <br><br>
+    You received this because you subscribed to Dizzy Signals.<br>
+    <a href="#">Unsubscribe</a> &nbsp;·&nbsp; <a href="#">Manage preferences</a>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+{
+  "subreddit": "YourSubredditName",
+  "poll_interval_seconds": 60,
+
+  "karma_tracker": {
+    "enabled": true,
+    "scan_posts_limit": 100,
+    "leaderboard_size": 10,
+    "post_title": "[Weekly] Top Contributors Leaderboard 🏆",
+    "post_day": "sunday",
+    "post_time": "18:00"
+  },
+
+  "auto_moderator": {
+    "enabled": true,
+    "karma_threshold": 10,
+    "removal_reason": "Hi! Your post was automatically removed because your account karma is below the minimum required to post in this subreddit (10 karma). Keep engaging with the community and try again soon!",
+    "flair_rules": [
+      {
+        "flair_text": "Question",
+        "css_class": "question",
+        "keywords": ["help", "how do", "question", "?", "advice"]
+      },
+      {
+        "flair_text": "Resource",
+        "css_class": "resource",
+        "keywords": ["guide", "tutorial", "resource", "tool", "tip"]
+      },
+      {
+        "flair_text": "Discussion",
+        "css_class": "discussion",
+        "keywords": ["discuss", "thoughts", "opinion", "what do you think"]
+      },
+      {
+        "flair_text": "Showcase",
+        "css_class": "showcase",
+        "keywords": ["made", "built", "created", "my project", "check out"]
+      }
+    ]
+  },
+
+  "scheduled_posts": {
+    "enabled": true
+  },
+
+  "welcome_dm": {
+    "enabled": true,
+    "subject": "Welcome to r/{subreddit}! 👋",
+    "message_template": "Hey u/{username} — welcome to r/{subreddit}!\n\nWe're glad to have you here. Here are a few things to get started:\n\n1. **Read the rules** before posting → check the sidebar\n2. **Introduce yourself** in the weekly intro thread\n3. **Engage** — upvote great content and leave helpful comments\n\nIf you have any questions, feel free to modmail us.\n\nSee you around!\n\n— The r/{subreddit} Mod Team"
+  },
+
+  "keyword_responder": {
+    "enabled": true,
+    "rules": [
+      {
+        "name": "wiki-prompt",
+        "triggers": ["where can I find", "is there a wiki", "any resources"],
+        "response": "Great question! Check out our **community wiki** in the sidebar — it covers the most common topics and has links to top resources. If you can't find what you're looking for, feel free to post and the community will help. 🙌"
+      },
+      {
+        "name": "rules-reminder",
+        "triggers": ["what are the rules", "posting rules", "subreddit rules"],
+        "response": "You can find the full rules in the **sidebar** or at r/{subreddit}/about/rules. The short version: be respectful, no spam, and keep posts on-topic. Let us know if you have questions!"
+      },
+      {
+        "name": "intro-prompt",
+        "triggers": ["new here", "just joined", "first post"],
+        "response": "Welcome! 👋 Don't forget to drop a comment in our weekly **Introduction Thread** so the community can get to know you. We're a friendly bunch!"
+      }
+    ]
+  }
+}

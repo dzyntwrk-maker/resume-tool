@@ -85,10 +85,14 @@ All 19 products are configured. Revenue is blocked until payment is connected.
 - `/prompt-library` — Prompt Library/Marketplace
 - `/api-docs` — Developer API Documentation
 
-### 🔲 NOT YET BUILT
-- Reddit bot (Tier 1 #2) — `reddit-bot/` folder
-- Trading signal newsletter (Tier 5 #26) — `trading-signals/`
-- White-label kit (Tier 5 #25) — `white-label-kit/`
+### ✅ TIER 1 EXTRA — Also built
+- `reddit-bot/` — PRAW bot with karma tracker, auto-mod, scheduled posts, welcome DMs, keyword responder
+
+### ✅ TIER 5 EXTRA — Also built
+- `trading-signals/` — Dizzy Signals newsletter: RSI/MACD/BB/MA confluence, yfinance, HTML email template
+- `white-label-kit/` — Agency license kit ($1k/$2.5k/$5k tiers), rebrand.sh, vercel-deploy.sh, LICENSE, pitch docs
+
+### ALL 30 INCOME STREAMS COMPLETE ✅
 
 ---
 
